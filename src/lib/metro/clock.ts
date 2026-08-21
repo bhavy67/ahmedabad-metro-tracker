@@ -88,3 +88,28 @@ export function formatClock(secondsOfDay: number): string {
   const sec = s % 60;
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
 }
+
+/** UI-facing 12H clock — `10:47 PM`. Split am/pm returned so callers can style the meridian. */
+export function formatClock12(secondsOfDay: number): { time: string; meridiem: 'AM' | 'PM' } {
+  const s = Math.floor(((secondsOfDay % DAY_SECONDS) + DAY_SECONDS) % DAY_SECONDS);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const meridiem: 'AM' | 'PM' = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return { time: `${h12}:${String(m).padStart(2, '0')}`, meridiem };
+}
+
+/** 12H clock as a single string — `10:47 PM`. */
+export function formatClockShort12(secondsOfDay: number): string {
+  const { time, meridiem } = formatClock12(secondsOfDay);
+  return `${time} ${meridiem}`;
+}
+
+/** Parses a schedule-style `HH:MM[:SS]` string into 12H — used for firstDeparture/lastArrival strings from the network JSON. */
+export function formatScheduleTime12(hhmm: string): string {
+  const [hStr, mStr] = hhmm.split(':');
+  const h = Number(hStr);
+  const m = Number(mStr);
+  if (Number.isNaN(h) || Number.isNaN(m)) return hhmm;
+  return formatClockShort12(h * 3600 + m * 60);
+}

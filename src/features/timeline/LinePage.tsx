@@ -1,15 +1,16 @@
 import { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router';
 import { animate, stagger } from 'animejs';
-import { IconClock, IconChevronDown } from '@tabler/icons-react';
+import { IconClock, IconChevronDown, IconArrowsExchange, IconArrowLeft } from '@tabler/icons-react';
 import { network, requireStation } from '@/src/lib/metro/network.ts';
 import { useLiveTrains } from '@/src/hooks/useLiveTrains.ts';
 import { useAnimeScope } from '@/src/hooks/useAnimeScope.ts';
+import { formatScheduleTime12 } from '@/src/lib/metro/clock.ts';
 import type { LineId, TrainRun } from '@/src/lib/metro/types.ts';
 
-const ROW_HEIGHT = 56;
+const ROW_HEIGHT = 64;
 /** Shared x-center (px, relative to the timeline container) for the track, station dots, and train markers. */
-const RAIL_LEFT = 23;
+const RAIL_LEFT = 28;
 
 export function LinePage() {
   const { lineId } = useParams<{ lineId: string }>();
@@ -29,23 +30,23 @@ export function LinePage() {
     root => {
       animate(root.querySelectorAll('[data-line-node]'), {
         opacity: [0, 1],
-        translateX: [-12, 0],
-        delay: stagger(28),
-        duration: 420,
+        translateX: [-10, 0],
+        delay: stagger(24),
+        duration: 380,
         ease: 'outQuad',
       });
       animate(root.querySelectorAll('[data-line-dot]'), {
         opacity: [0, 1],
         scale: [0, 1],
-        delay: stagger(28),
-        duration: 420,
+        delay: stagger(24),
+        duration: 380,
         ease: 'outQuad',
       });
       const track = root.querySelector('[data-line-track]');
       if (track) {
         animate(track, {
           scaleY: [0, 1],
-          duration: Math.min(900, stationOrder.length * 45),
+          duration: Math.min(800, stationOrder.length * 40),
           ease: 'outQuad',
         });
       }
@@ -55,23 +56,35 @@ export function LinePage() {
 
   return (
     <div className="pb-8">
-      <div className="border-b border-border bg-card px-4 pb-4 pt-3">
-        <span
-          className="mb-2 inline-block rounded-full px-2.5 py-1 font-display text-xs font-bold uppercase tracking-wide"
-          style={{ backgroundColor: `var(--line-${line})`, color: `var(--line-${line}-ink)` }}
+      {/* Full-bleed line color header — the identity anchor for the page. */}
+      <div
+        className="relative px-4 pt-4 pb-5"
+        style={{ backgroundColor: `var(--line-${line})`, color: `var(--line-${line}-ink)` }}
+      >
+        <Link
+          to="/"
+          aria-label="Back to home"
+          className="press mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/15 backdrop-blur"
         >
-          {meta.name}
-        </span>
-        <h1 className="font-display text-lg font-semibold leading-tight">
-          {meta.from} → {meta.to}
-        </h1>
-        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-          <IconClock size={13} /> {meta.firstDeparture.slice(0, 5)} – {meta.lastArrival.slice(0, 5)} ·{' '}
-          {stationOrder.length} stations
+          <IconArrowLeft size={18} />
+        </Link>
+        <p className="font-display text-[11px] font-bold uppercase tracking-widest opacity-80">
+          {meta.name} Line
         </p>
+        <h1 className="mt-1 font-display text-[22px] font-semibold leading-tight">
+          {meta.from}
+          <span className="mx-1.5 opacity-70">→</span>
+          {meta.to}
+        </h1>
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] font-medium opacity-90">
+          <span className="tnum flex items-center gap-1 font-mono">
+            <IconClock size={14} /> {formatScheduleTime12(meta.firstDeparture)} – {formatScheduleTime12(meta.lastArrival)}
+          </span>
+          <span className="tnum font-mono">{stationOrder.length} stations</span>
+        </div>
       </div>
 
-      <div ref={listRef} className="relative px-4 pt-4">
+      <div ref={listRef} className="relative px-4 pt-5">
         {/* The track spans from the vertical center of the first station dot to the
             vertical center of the last — not from the container's top edge — so it
             terminates exactly at both end dots rather than overshooting or falling short. */}
@@ -80,30 +93,31 @@ export function LinePage() {
           className="absolute w-[3px] origin-top -translate-x-1/2 rounded-full"
           style={{
             left: RAIL_LEFT,
-            top: 16 + ROW_HEIGHT / 2,
+            top: 20 + ROW_HEIGHT / 2,
             height: (stationOrder.length - 1) * ROW_HEIGHT,
             backgroundColor: `var(--line-${line})`,
-            opacity: 0.35,
+            opacity: 0.4,
           }}
         />
 
-        {/* Station dots are positioned exactly like the track and train markers above —
-            absolute, relative to THIS container directly — deliberately not nested
-            inside the <li> below. Nesting them in the (normal-flow, px-4-indented) list
-            item stacks the container's own padding on top of the dot's own absolute
-            offset, since an absolutely positioned element ignores its ancestor's
-            padding while a normal-flow ancestor does not — that mismatch is exactly
-            what pushed the dots to the right of the rail before this fix. */}
-        {stationOrder.map((stationId, idx) => (
-          <span
-            key={stationId}
-            data-line-dot
-            className="absolute z-10 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-background"
-            style={{ left: RAIL_LEFT, top: 16 + idx * ROW_HEIGHT + ROW_HEIGHT / 2, backgroundColor: `var(--line-${line})` }}
-          />
-        ))}
+        {stationOrder.map((stationId, idx) => {
+          const station = requireStation(stationId);
+          return (
+            <span
+              key={stationId}
+              data-line-dot
+              className="absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-background"
+              style={{
+                left: RAIL_LEFT,
+                top: 20 + idx * ROW_HEIGHT + ROW_HEIGHT / 2,
+                width: station.isInterchange ? 16 : 12,
+                height: station.isInterchange ? 16 : 12,
+                backgroundColor: `var(--line-${line})`,
+              }}
+            />
+          );
+        })}
 
-        {/* Live train markers, positioned by fractional row offset from the top. */}
         {runsOnLine.map(run => (
           <TrainMarker key={run.tripKey} run={run} line={line} stationOrder={stationOrder} />
         ))}
@@ -113,9 +127,17 @@ export function LinePage() {
             const station = requireStation(stationId);
             return (
               <li key={stationId} data-line-node style={{ height: ROW_HEIGHT }} className="relative">
-                <Link to={`/station/${stationId}`} className="flex h-full flex-col justify-center" style={{ paddingLeft: RAIL_LEFT + 20 }}>
-                  <p className="truncate text-sm font-medium">{station.name}</p>
-                  {station.isInterchange && <p className="text-[10px] text-muted-foreground">Interchange</p>}
+                <Link
+                  to={`/station/${stationId}`}
+                  className="press flex h-full flex-col justify-center rounded-lg pr-2"
+                  style={{ paddingLeft: RAIL_LEFT + 24 }}
+                >
+                  <p className="truncate text-[15px] font-medium text-foreground">{station.name}</p>
+                  {station.isInterchange && (
+                    <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <IconArrowsExchange size={11} /> Interchange
+                    </p>
+                  )}
                 </Link>
               </li>
             );
@@ -132,10 +154,7 @@ function TrainMarker({ run, line, stationOrder }: { run: TrainRun; line: LineId;
   if (fromIdx === -1 || toIdx === -1) return null;
 
   const fraction = fromIdx + (toIdx - fromIdx) * run.progress;
-  const top = 16 + fraction * ROW_HEIGHT + ROW_HEIGHT / 2;
-  // Direction derived straight from the station indices, not the trip's own
-  // fwd/bwd label — so it stays correct even for through-running trips whose
-  // label refers to the whole (possibly multi-line) journey, not this segment.
+  const top = 20 + fraction * ROW_HEIGHT + ROW_HEIGHT / 2;
   const movingDown = toIdx > fromIdx;
 
   return (
@@ -144,15 +163,15 @@ function TrainMarker({ run, line, stationOrder }: { run: TrainRun; line: LineId;
       style={{ left: RAIL_LEFT, top }}
       title={`${run.status === 'dwelling' ? 'At platform' : 'En route'} → ${run.destinationStationId}`}
     >
-      <span className="relative flex h-5 w-5 items-center justify-center">
+      <span className="relative flex h-6 w-6 items-center justify-center">
         <span className="signal-ping absolute inset-0 opacity-60" style={{ color: `var(--line-${line})` }} />
         <span
-          className="relative flex h-5 w-5 items-center justify-center rounded-full border-2 border-background shadow-md"
+          className="relative flex h-6 w-6 items-center justify-center rounded-full border-2 border-background shadow-md"
           style={{ backgroundColor: `var(--line-${line})` }}
         >
           <IconChevronDown
-            size={12}
-            stroke={3.5}
+            size={14}
+            stroke={3.25}
             className="text-white/95 transition-transform duration-500"
             style={{ transform: movingDown ? 'rotate(0deg)' : 'rotate(180deg)' }}
           />

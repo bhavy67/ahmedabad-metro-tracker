@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Map as MaplibreMap, Marker, NavigationControl, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { IconLocationBolt } from '@tabler/icons-react';
 import { buildLineFeatures, networkBounds } from '@/src/lib/metro/mapData.ts';
 import { runningTrips, positionOf } from '@/src/lib/metro/live.ts';
 import { currentEpochMs, istSecondsOfDay, istDayOfWeek } from '@/src/lib/metro/clock.ts';
@@ -20,8 +21,14 @@ import { StationPopoverCard } from './StationPopoverCard.tsx';
  * anyway; going straight to DOM/SVG is simpler and just as fast.
  */
 
-function basemapStyle(): StyleSpecification {
-  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+function isDarkMode(): boolean {
+  const root = document.documentElement;
+  if (root.classList.contains('dark')) return true;
+  if (root.classList.contains('light')) return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function basemapStyle(dark: boolean): StyleSpecification {
   const url = dark
     ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
     : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
@@ -45,8 +52,8 @@ function stationMarkerEl(color: string, isInterchange: boolean): HTMLDivElement 
   // than this makes the whole network read as a dense strip of dots instead
   // of a line. Interchanges get one visual cue (a slightly larger dot with a
   // heavier ring), not two competing ones.
-  const size = isInterchange ? 10 : 6;
-  const ring = isInterchange ? 2 : 1.5;
+  const size = isInterchange ? 12 : 7;
+  const ring = isInterchange ? 2.5 : 1.5;
   el.style.cssText = `
     width:${size}px; height:${size}px; border-radius:9999px; cursor:pointer;
     background:${color}; box-shadow: 0 0 0 ${ring}px #fff, 0 1px 2px rgba(0,0,0,.35);
@@ -57,18 +64,12 @@ function stationMarkerEl(color: string, isInterchange: boolean): HTMLDivElement 
 function trainMarkerEl(color: string): HTMLDivElement {
   const el = document.createElement('div');
   el.className = 'metro-train-marker';
-  // No `position` here: MapLibre's own `.maplibregl-marker` rule supplies
-  // `position:absolute`, and an inline value would out-specificity it and drop
-  // the marker back into normal flow, where it stacks with its siblings instead
-  // of tracking its lng/lat.
-  el.style.cssText = `width:16px; height:16px; cursor:pointer;`;
-  // Chevron points up == bearing 0; the marker's map-aligned rotation turns it
-  // to the train's real heading. Same cue as the line timeline's train marker.
+  el.style.cssText = `width:18px; height:18px; cursor:pointer;`;
   el.innerHTML = `
     <span class="signal-ping" style="position:absolute; inset:0; opacity:.6; color:${color};"></span>
     <span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-                 border-radius:9999px; background:${color}; border:1.5px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.5);">
-      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="rgba(255,255,255,.95)"
+                 border-radius:9999px; background:${color}; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.5);">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="rgba(255,255,255,.98)"
            stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
         <path d="M6 15l6-6 6 6"/>
       </svg>
@@ -91,37 +92,26 @@ export function MapPage() {
 
   selectedTrainRef.current = selectedTrain;
 
-  // Map setup: basemap, station markers, static line overlay. Runs once.
   useEffect(() => {
     if (!containerRef.current) return;
     const map = new MaplibreMap({
       container: containerRef.current,
-      style: basemapStyle(),
+      style: basemapStyle(isDarkMode()),
       bounds: networkBounds(),
       fitBoundsOptions: { padding: 48 },
       attributionControl: { compact: true },
-      // This is a purely local city app — the map never needs to show the
-      // world wrapping around. Disabling world copies also sidesteps a real
-      // MapLibre marker bug: at low zoom, when multiple world copies are
-      // rendered, a Marker's assignment to "which copy" can glitch during
-      // zoom transitions, making it appear shifted by a huge distance even
-      // though its actual lng/lat never changed.
       renderWorldCopies: false,
       maxZoom: 18,
       minZoom: 9,
     });
     mapRef.current = map;
-    map.addControl(new NavigationControl({ showCompass: false }), 'bottom-right');
+    map.addControl(new NavigationControl({ showCompass: false }), 'top-right');
 
-    // Inserted into the canvas container — the same element markers are
-    // appended to — right after the canvas (created synchronously above) and
-    // before any markers get added below, so DOM order alone guarantees:
-    // basemap canvas < line overlay < markers.
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('class', 'pointer-events-none absolute inset-0 h-full w-full');
     map.getCanvasContainer().appendChild(svg);
 
-    const lineFeatures = buildLineFeatures(); // static — computed once, not on every redraw
+    const lineFeatures = buildLineFeatures();
     const syncLineOverlay = () => {
       const paths = lineFeatures
         .map(f => {
@@ -129,18 +119,12 @@ export function MapPage() {
             const p = map.project([lng, lat]);
             return `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`;
           }).join(' ');
-          return `<path d="${d}" fill="none" stroke="${f.properties.color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>`;
+          return `<path d="${d}" fill="none" stroke="${f.properties.color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>`;
         })
         .join('');
       svg.innerHTML = paths;
     };
 
-    // Coalesce into the browser's paint cycle instead of redrawing on every
-    // raw 'move' event (which can fire faster than one paint during a zoom
-    // gesture) — otherwise the line overlay's redraw lags a frame or two
-    // behind MapLibre's own (GPU-composited) marker repositioning, and the
-    // two visibly drift apart mid-zoom even though both are geographically
-    // correct at rest.
     let overlaySyncQueued = false;
     const scheduleSyncLineOverlay = () => {
       if (overlaySyncQueued) return;
@@ -164,13 +148,32 @@ export function MapPage() {
       setReady(true);
     });
 
+    // React to theme changes (auto + manual) by swapping the raster tiles.
+    let currentDark = isDarkMode();
+    const applyTheme = () => {
+      const dark = isDarkMode();
+      if (dark === currentDark) return;
+      currentDark = dark;
+      map.setStyle(basemapStyle(dark));
+      map.once('styledata', () => {
+        // Re-append the SVG overlay after style swap (getCanvasContainer is stable).
+        map.getCanvasContainer().appendChild(svg);
+        syncLineOverlay();
+      });
+    };
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', applyTheme);
+    const observer = new MutationObserver(applyTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
     return () => {
+      mq.removeEventListener('change', applyTheme);
+      observer.disconnect();
       map.remove();
       mapRef.current = null;
     };
   }, []);
 
-  // Live train markers: diff running trips against existing Marker instances every frame.
   useEffect(() => {
     if (!ready) return;
     let frame: number;
@@ -195,8 +198,6 @@ export function MapPage() {
             el.addEventListener('click', () => setSelectedTrain(runsByKeyRef.current.get(run.tripKey) ?? null));
             const marker = new Marker({
               element: el,
-              // Heading is a geographic fact, so the chevron turns with the map;
-              // the dot itself stays flat and legible under pitch.
               rotationAlignment: 'map',
               pitchAlignment: 'viewport',
             })
@@ -224,11 +225,27 @@ export function MapPage() {
     return () => cancelAnimationFrame(frame);
   }, [ready]);
 
+  const recenter = () => {
+    const map = mapRef.current;
+    if (map) map.fitBounds(networkBounds(), { padding: 48, duration: 700 });
+  };
+
   return (
     <div className="relative h-full w-full">
       <div ref={containerRef} className="h-full w-full" />
+
+      {/* Recenter FAB — large tap target, always visible in the safe spot above bottom sheet. */}
+      <button
+        type="button"
+        onClick={recenter}
+        aria-label="Recenter to network"
+        className="press absolute bottom-4 right-4 z-10 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-lg"
+      >
+        <IconLocationBolt size={20} />
+      </button>
+
       {isClockOverridden() && (
-        <div className="pointer-events-none absolute left-3 top-3 rounded-md bg-destructive px-2 py-1 font-mono text-[10px] font-semibold text-destructive-foreground">
+        <div className="pointer-events-none absolute left-3 top-3 rounded-md bg-destructive px-2 py-1 font-mono text-[11px] font-semibold text-destructive-foreground">
           DEV CLOCK OVERRIDE
         </div>
       )}

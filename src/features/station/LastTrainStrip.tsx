@@ -4,7 +4,6 @@ import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
 import { lastTrainToday } from '@/src/lib/metro/eta.ts';
 import { requireStation } from '@/src/lib/metro/network.ts';
 import { cn } from '@/lib/utils';
-import ElectricBorder from '@/components/ElectricBorder.tsx';
 
 const WARNING_THRESHOLD_MINUTES = 60;
 const URGENT_THRESHOLD_MINUTES = 15;
@@ -16,41 +15,41 @@ export function LastTrainStrip({ stationId }: { stationId: string }) {
   const relevant = lastTrains.filter(t => t.minutesRemaining >= 0 && t.minutesRemaining <= WARNING_THRESHOLD_MINUTES);
   if (relevant.length === 0) return null;
 
-  // A genuinely urgent "can I still get home?" moment earns the one bold,
-  // energetic touch in this app — everywhere else stays quiet by design.
+  // A genuinely urgent "can I still get home?" moment — a quiet, unmistakable
+  // pulse (see .urgent-pulse in index.css) replaces the previous chaotic border.
   const anyUrgent = relevant.some(t => t.minutesRemaining <= URGENT_THRESHOLD_MINUTES);
 
-  const body = (
-    <div className={cn('space-y-1.5 rounded-xl px-3 py-2.5', anyUrgent ? 'bg-destructive/10' : 'border border-destructive/30 bg-destructive/10')}>
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-destructive">
-        <IconMoonStars size={14} />
-        Last train tonight
-      </div>
-      {relevant.map(t => {
-        const destination = requireStation(t.destinationStationId);
-        const urgent = t.minutesRemaining <= URGENT_THRESHOLD_MINUTES;
-        return (
-          <div key={`${t.line}-${t.direction}`} className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: `var(--line-${t.line})` }} />
-              to {destination.name}
-            </span>
-            <span className={cn('tnum font-mono font-semibold', urgent ? 'text-destructive' : 'text-foreground')}>
-              {t.minutesRemaining} min
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-
-  if (!anyUrgent) return <div className="mx-4 mb-3">{body}</div>;
-
   return (
-    <div className="mx-4 mb-3">
-      <ElectricBorder color="#ff4757" speed={1.3} chaos={0.5} borderRadius={12}>
-        {body}
-      </ElectricBorder>
+    <div className="px-4 pb-3 pt-1">
+      <div
+        className={cn(
+          'space-y-2 rounded-xl border px-3.5 py-3',
+          anyUrgent
+            ? 'urgent-pulse border-destructive/40 bg-destructive/10'
+            : 'border-destructive/20 bg-destructive/5'
+        )}
+      >
+        <div className="flex items-center gap-1.5 text-[13px] font-semibold text-destructive">
+          <IconMoonStars size={15} />
+          Last train tonight
+        </div>
+        {relevant.map(t => {
+          const destination = requireStation(t.destinationStationId);
+          const urgent = t.minutesRemaining <= URGENT_THRESHOLD_MINUTES;
+          return (
+            <div key={`${t.line}-${t.direction}`} className="flex items-center justify-between text-[14px]">
+              <span className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: `var(--line-${t.line})` }} />
+                <span className="font-medium">to {destination.name}</span>
+              </span>
+              <span className={cn('tnum font-mono', urgent ? 'text-destructive' : 'text-foreground')}>
+                <span className="text-[16px] font-bold">{t.minutesRemaining}</span>{' '}
+                <span className="text-[11px] font-medium uppercase opacity-70">min</span>
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -1,27 +1,51 @@
 import { Link } from 'react-router';
-import { IconX } from '@tabler/icons-react';
-import { requireStation } from '@/src/lib/metro/network.ts';
+import { IconArrowRight, IconBuildingArch, IconArrowsExchange } from '@tabler/icons-react';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { requireStation, network } from '@/src/lib/metro/network.ts';
 import { DepartureBoard } from '@/src/features/station/DepartureBoard.tsx';
 
 export function StationPopoverCard({ stationId, onClose }: { stationId: string; onClose: () => void }) {
   const station = requireStation(stationId);
 
   return (
-    <div className="absolute inset-x-3 bottom-3 z-10 max-h-[45dvh] overflow-y-auto rounded-xl border border-border bg-card/95 shadow-xl backdrop-blur">
-      <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-        <div>
-          <Link to={`/station/${station.id}`} className="font-display text-sm font-semibold hover:underline">
+    <Drawer open onOpenChange={open => !open && onClose()} showSwipeHandle>
+      <DrawerContent>
+        <DrawerHeader>
+          <div className="mb-1.5 flex flex-wrap items-center gap-1.5">
+            {station.lines.map(line => (
+              <span
+                key={line}
+                className="inline-block rounded-full px-2 py-0.5 font-display text-[11px] font-bold uppercase tracking-wide"
+                style={{ backgroundColor: `var(--line-${line})`, color: `var(--line-${line}-ink)` }}
+              >
+                {network.lines[line].name}
+              </span>
+            ))}
+            {station.isInterchange && (
+              <span className="inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground">
+                <IconArrowsExchange size={12} /> Interchange
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground">
+              <IconBuildingArch size={12} /> {station.isUnderground ? 'Underground' : 'Elevated'}
+            </span>
+          </div>
+          <DrawerTitle className="font-display text-[20px] font-semibold leading-tight">
             {station.name}
-          </Link>
-          <p className="text-[11px] text-muted-foreground">{station.isUnderground ? 'Underground' : 'Elevated'} station</p>
+          </DrawerTitle>
+        </DrawerHeader>
+        <div className="px-4 pb-3">
+          <DepartureBoard stationId={station.id} limit={5} />
         </div>
-        <button type="button" onClick={onClose} aria-label="Close" className="rounded-full p-1.5 text-muted-foreground active:bg-accent">
-          <IconX size={16} />
-        </button>
-      </div>
-      <div className="px-4">
-        <DepartureBoard stationId={station.id} limit={4} />
-      </div>
-    </div>
+        <div className="px-4 pb-5">
+          <Link
+            to={`/station/${station.id}`}
+            className="press flex items-center justify-center gap-1 rounded-xl border border-border bg-card px-4 py-3 text-[14px] font-medium text-foreground"
+          >
+            Open station <IconArrowRight size={15} />
+          </Link>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 }

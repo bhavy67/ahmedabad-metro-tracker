@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { IconSearch, IconChevronRight } from '@tabler/icons-react';
+import { IconSearch, IconChevronRight, IconMapPin, IconFlag } from '@tabler/icons-react';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { allStations } from '@/src/lib/metro/network.ts';
 import type { NetworkStation } from '@/src/lib/metro/types.ts';
@@ -9,11 +9,13 @@ export function StationPicker({
   value,
   onChange,
   exclude,
+  icon = 'from',
 }: {
   label: string;
   value: NetworkStation | null;
   onChange: (station: NetworkStation) => void;
   exclude?: string;
+  icon?: 'from' | 'to';
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -26,28 +28,37 @@ export function StationPicker({
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [query, exclude]);
 
+  const Icon = icon === 'from' ? IconMapPin : IconFlag;
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger className="flex w-full items-center justify-between rounded-xl border border-border bg-card px-3.5 py-3 text-left">
-        <div>
-          <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-          <p className="font-display text-sm font-semibold">{value ? value.name : 'Select a station'}</p>
-        </div>
-        <IconChevronRight size={16} className="text-muted-foreground" />
+      <SheetTrigger className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left shadow-sm">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
+          <Icon size={18} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            {label}
+          </span>
+          <span className="block truncate font-display text-[15px] font-semibold text-foreground">
+            {value ? value.name : 'Select a station'}
+          </span>
+        </span>
+        <IconChevronRight size={18} className="text-muted-foreground" />
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-[85dvh]">
-        <SheetHeader>
-          <SheetTitle>{label}</SheetTitle>
+      <SheetContent side="bottom" className="h-[85dvh] rounded-t-3xl">
+        <SheetHeader className="pb-2">
+          <SheetTitle className="font-display text-[17px] font-semibold">{label}</SheetTitle>
         </SheetHeader>
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4">
-          <div className="relative mb-2 shrink-0">
-            <IconSearch size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative mb-3 shrink-0">
+            <IconSearch size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               autoFocus
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search stations…"
-              className="w-full rounded-lg border border-border bg-background py-2.5 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-[15px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
             />
           </div>
           <ul className="min-h-0 flex-1 divide-y divide-border overflow-y-auto">
@@ -60,20 +71,24 @@ export function StationPicker({
                     setOpen(false);
                     setQuery('');
                   }}
-                  className="flex w-full items-center gap-2.5 py-2.5 text-left"
+                  className="press flex w-full items-center gap-3 py-3 text-left"
                 >
-                  <span className="flex gap-0.5">
+                  <span className="flex shrink-0 gap-0.5">
                     {station.lines.map(line => (
-                      <span key={line} className="h-2 w-2 rounded-full" style={{ backgroundColor: `var(--line-${line})` }} />
+                      <span key={line} className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: `var(--line-${line})` }} />
                     ))}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium">{station.name}</span>
+                    <span className="block text-[15px] font-semibold text-foreground">{station.name}</span>
+                    {station.isInterchange && (
+                      <span className="block text-[12px] text-muted-foreground">Interchange</span>
+                    )}
                   </span>
+                  <IconChevronRight size={16} className="text-muted-foreground" />
                 </button>
               </li>
             ))}
-            {results.length === 0 && <li className="py-6 text-center text-sm text-muted-foreground">No stations match "{query}"</li>}
+            {results.length === 0 && <li className="py-8 text-center text-[14px] text-muted-foreground">No stations match "{query}"</li>}
           </ul>
         </div>
       </SheetContent>
