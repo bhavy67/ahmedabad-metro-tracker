@@ -7,6 +7,9 @@ import {VitePWA} from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+    optimizeDeps: {
+        exclude: ['maplibre-gl'],
+    },
     plugins: [
         react(),
         tailwindcss(),

@@ -57,12 +57,21 @@ function stationMarkerEl(color: string, isInterchange: boolean): HTMLDivElement 
 function trainMarkerEl(color: string): HTMLDivElement {
   const el = document.createElement('div');
   el.className = 'metro-train-marker';
-  el.style.cssText = `width:15px; height:15px; cursor:pointer; position:relative;`;
+  // No `position` here: MapLibre's own `.maplibregl-marker` rule supplies
+  // `position:absolute`, and an inline value would out-specificity it and drop
+  // the marker back into normal flow, where it stacks with its siblings instead
+  // of tracking its lng/lat.
+  el.style.cssText = `width:16px; height:16px; cursor:pointer;`;
+  // Chevron points up == bearing 0; the marker's map-aligned rotation turns it
+  // to the train's real heading. Same cue as the line timeline's train marker.
   el.innerHTML = `
     <span class="signal-ping" style="position:absolute; inset:0; opacity:.6; color:${color};"></span>
-    <span style="position:relative; display:flex; width:100%; height:100%; align-items:center; justify-content:center;
+    <span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
                  border-radius:9999px; background:${color}; border:1.5px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.5);">
-      <span style="width:4.5px; height:4.5px; border-radius:9999px; background:rgba(255,255,255,.9);"></span>
+      <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="rgba(255,255,255,.95)"
+           stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+        <path d="M6 15l6-6 6 6"/>
+      </svg>
     </span>
   `;
   return el;
@@ -104,12 +113,13 @@ export function MapPage() {
     mapRef.current = map;
     map.addControl(new NavigationControl({ showCompass: false }), 'bottom-right');
 
-    // Inserted directly into the map's own container, right after its canvas
-    // (created synchronously above) and before any markers get added below —
-    // DOM order alone then guarantees: basemap canvas < line overlay < markers.
+    // Inserted into the canvas container — the same element markers are
+    // appended to — right after the canvas (created synchronously above) and
+    // before any markers get added below, so DOM order alone guarantees:
+    // basemap canvas < line overlay < markers.
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('class', 'pointer-events-none absolute inset-0 h-full w-full');
-    containerRef.current.appendChild(svg);
+    map.getCanvasContainer().appendChild(svg);
 
     const lineFeatures = buildLineFeatures(); // static — computed once, not on every redraw
     const syncLineOverlay = () => {
@@ -178,12 +188,21 @@ export function MapPage() {
           const pos = positionOf(run);
           const existing = trainMarkersRef.current.get(run.tripKey);
           if (existing) {
-            existing.marker.setLngLat([pos.lng, pos.lat]);
+            existing.marker.setLngLat([pos.lng, pos.lat]).setRotation(pos.bearingDeg);
           } else {
             const color = network.lines[run.line].color;
             const el = trainMarkerEl(color);
             el.addEventListener('click', () => setSelectedTrain(runsByKeyRef.current.get(run.tripKey) ?? null));
-            const marker = new Marker({ element: el }).setLngLat([pos.lng, pos.lat]).addTo(map);
+            const marker = new Marker({
+              element: el,
+              // Heading is a geographic fact, so the chevron turns with the map;
+              // the dot itself stays flat and legible under pitch.
+              rotationAlignment: 'map',
+              pitchAlignment: 'viewport',
+            })
+              .setLngLat([pos.lng, pos.lat])
+              .setRotation(pos.bearingDeg)
+              .addTo(map);
             trainMarkersRef.current.set(run.tripKey, { marker, line: run.line });
           }
         }
