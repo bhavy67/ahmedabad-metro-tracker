@@ -2,6 +2,8 @@ import { Outlet, useLocation } from 'react-router';
 import { LiveLineStrip } from './LiveLineStrip.tsx';
 import { BottomTabBar } from './BottomTabBar.tsx';
 import { Sidebar } from './Sidebar.tsx';
+import { OfflineBanner } from '@/src/features/pwa/OfflineBanner.tsx';
+import { UpdateBanner } from '@/src/features/pwa/UpdateBanner.tsx';
 
 export function AppShell() {
   const { pathname } = useLocation();
@@ -18,6 +20,9 @@ export function AppShell() {
         <div className="lg:hidden">
           <LiveLineStrip />
         </div>
+
+        <OfflineBanner />
+        <UpdateBanner />
 
         <main
           id="app-scroll-container"

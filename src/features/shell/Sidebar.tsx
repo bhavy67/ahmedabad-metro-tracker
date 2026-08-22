@@ -7,6 +7,7 @@ import type { LineId } from '@/src/lib/metro/types.ts';
 import { cn } from '@/lib/utils';
 import { LiveBadge } from './LiveBadge.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
+import { InstallButton } from '@/src/features/pwa/InstallButton.tsx';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: IconHome2, match: (p: string) => p === '/' },
@@ -108,6 +109,7 @@ export function Sidebar() {
 
       <div className="flex items-center gap-1.5 border-t border-border px-3 py-3">
         <LiveBadge />
+        <InstallButton />
         <ThemeToggle />
       </div>
     </aside>

@@ -55,7 +55,7 @@ export function HomePage() {
       </section>
 
       {/* Nearest station — primary destination card. */}
-      <section className="px-4">
+      <section className="px-4 pt-4">
         {nearest.status === 'idle' || nearest.status === 'error' ? (
           <div className="rounded-2xl border border-dashed border-border-strong bg-card-muted/50 px-5 py-6 text-center">
             <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">

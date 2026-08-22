@@ -6,6 +6,7 @@ import { LINE_IDS, network } from '@/src/lib/metro/network.ts';
 import type { LineId } from '@/src/lib/metro/types.ts';
 import { LiveBadge } from './LiveBadge.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
+import { InstallButton } from '@/src/features/pwa/InstallButton.tsx';
 
 const LINE_SHORT_LABEL: Record<LineId, string> = { blue: 'Blue', red: 'Red', yellow: 'Yellow', violet: 'Violet' };
 
@@ -31,6 +32,7 @@ export function LiveLineStrip() {
           </span>
         </Link>
         <div className="flex items-center gap-1">
+          <InstallButton />
           <LiveBadge />
           <ThemeToggle />
         </div>

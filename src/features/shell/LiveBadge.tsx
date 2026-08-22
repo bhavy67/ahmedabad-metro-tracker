@@ -1,18 +1,26 @@
 import { IconBroadcast, IconClockHour4, IconAlertTriangle, type Icon as TablerIcon } from '@tabler/icons-react';
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose } from '@/components/ui/drawer';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function LiveBadge() {
   return (
     <Drawer showSwipeHandle>
-      <DrawerTrigger className="press inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground shadow-sm hover:bg-accent">
-        <span className="relative inline-flex h-2 w-2">
-          <span className="signal-ping absolute inset-0 text-primary" />
-          <span className="relative inline-block h-2 w-2 rounded-full bg-primary" />
-        </span>
-        <span>Live</span>
-      </DrawerTrigger>
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <DrawerTrigger className="press inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground shadow-sm hover:bg-accent" />
+          }
+        >
+          <span className="relative inline-flex h-2 w-2">
+            <span className="signal-ping absolute inset-0 text-primary" />
+            <span className="relative inline-block h-2 w-2 rounded-full bg-primary" />
+          </span>
+          <span>Live</span>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">About live data</TooltipContent>
+      </Tooltip>
 
       <DrawerContent>
         <div className="px-5 pt-4">
