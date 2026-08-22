@@ -8,6 +8,7 @@ import { LINE_IDS, network, getStation } from '@/src/lib/metro/network.ts';
 import { formatClock12, formatScheduleTime12 } from '@/src/lib/metro/clock.ts';
 import { DepartureBoard } from '@/src/features/station/DepartureBoard.tsx';
 import { LastTrainStrip } from '@/src/features/station/LastTrainStrip.tsx';
+import { CommuteCard } from '@/src/features/commute/CommuteCard.tsx';
 import { Button } from '@/components/ui/button';
 
 function greeting(secondsOfDay: number): string {
@@ -52,6 +53,11 @@ export function HomePage() {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* Commute card */}
+      <section className="px-4 pt-4">
+        <CommuteCard />
       </section>
 
       {/* Nearest station — primary destination card. */}
