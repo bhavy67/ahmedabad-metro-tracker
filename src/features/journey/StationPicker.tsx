@@ -1,6 +1,13 @@
 import { useMemo, useState } from 'react';
-import { IconSearch, IconChevronRight, IconMapPin, IconFlag } from '@tabler/icons-react';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { IconSearch, IconChevronRight, IconMapPin, IconFlag, IconX } from '@tabler/icons-react';
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from '@/components/ui/drawer';
 import { allStations } from '@/src/lib/metro/network.ts';
 import type { NetworkStation } from '@/src/lib/metro/types.ts';
 
@@ -31,8 +38,8 @@ export function StationPicker({
   const Icon = icon === 'from' ? IconMapPin : IconFlag;
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left shadow-sm">
+    <Drawer open={open} onOpenChange={open => { setOpen(open); if (!open) setQuery(''); }} showSwipeHandle>
+      <DrawerTrigger className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left shadow-sm">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
           <Icon size={18} />
         </span>
@@ -45,11 +52,18 @@ export function StationPicker({
           </span>
         </span>
         <IconChevronRight size={18} className="text-muted-foreground" />
-      </SheetTrigger>
-      <SheetContent side="bottom" className="h-[85dvh] rounded-t-3xl">
-        <SheetHeader className="pb-2">
-          <SheetTitle className="font-display text-[17px] font-semibold">{label}</SheetTitle>
-        </SheetHeader>
+      </DrawerTrigger>
+
+      <DrawerContent style={{ '--drawer-height': '85dvh' } as React.CSSProperties}>
+        <DrawerHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <DrawerTitle className="font-display text-[17px] font-semibold">{label}</DrawerTitle>
+            <DrawerClose render={<button type="button" aria-label="Close" className="press flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground" />}>
+              <IconX size={18} />
+            </DrawerClose>
+          </div>
+        </DrawerHeader>
+
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4">
           <div className="relative mb-3 shrink-0">
             <IconSearch size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -88,10 +102,14 @@ export function StationPicker({
                 </button>
               </li>
             ))}
-            {results.length === 0 && <li className="py-8 text-center text-[14px] text-muted-foreground">No stations match "{query}"</li>}
+            {results.length === 0 && (
+              <li className="py-8 text-center text-[14px] text-muted-foreground">
+                No stations match "{query}"
+              </li>
+            )}
           </ul>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 }
