@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
-import { IconArrowsUpDown, IconClock, IconArrowsExchange, IconTicket, IconArrowRight } from '@tabler/icons-react';
+import { IconArrowsUpDown, IconClock, IconArrowsExchange, IconTicket, IconArrowRight, IconClockHour4 } from '@tabler/icons-react';
 import { StationPicker } from './StationPicker.tsx';
 import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
 import { planJourney, planJourneyArriveBy } from '@/src/lib/metro/plan.ts';
@@ -10,6 +10,8 @@ import type { NetworkStation } from '@/src/lib/metro/types.ts';
 import { Button } from '@/components/ui/button';
 import CountUp from '@/components/CountUp.tsx';
 import { cn } from '@/lib/utils';
+import { useRecentJourneys } from '@/src/hooks/useRecentJourneys.ts';
+import { getStation } from '@/src/lib/metro/network.ts';
 
 type PlanMode = 'depart' | 'arrive';
 
@@ -36,6 +38,15 @@ export function PlanPage() {
     secondsToHHMM(secondsOfDay + 30 * 60)
   );
 
+  const { recents, add: addRecent } = useRecentJourneys();
+
+  // Save to recents whenever a complete pair is selected
+  useEffect(() => {
+    if (origin && destination && origin.id !== destination.id) {
+      addRecent(origin.id, destination.id);
+    }
+  }, [origin?.id, destination?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const plan = useMemo(() => {
     if (!origin || !destination) return undefined;
     if (mode === 'depart') {
@@ -43,6 +54,13 @@ export function PlanPage() {
     }
     return planJourneyArriveBy(origin.id, destination.id, parseHHMM(arriveByTime), dayOfWeek);
   }, [origin, destination, secondsOfDay, dayOfWeek, mode, arriveByTime]);
+
+  function pickRecent(originId: string, destinationId: string) {
+    const o = getStation(originId);
+    const d = getStation(destinationId);
+    if (o) setOrigin(o);
+    if (d) setDestination(d);
+  }
 
   function switchMode(next: PlanMode) {
     if (next === 'arrive' && mode === 'depart') {
@@ -56,6 +74,39 @@ export function PlanPage() {
     <div className="pb-8">
       <div className="border-b border-border bg-card px-4 pb-5 pt-4">
         <h1 className="mb-4 font-display text-[22px] font-semibold tracking-tight">Plan your journey</h1>
+
+        {/* Recent journeys — shown as quick-picks when pickers are empty */}
+        {recents.length > 0 && !origin && !destination && (
+          <div className="mb-4">
+            <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <IconClockHour4 size={13} stroke={2} /> Recent
+            </p>
+            <div className="space-y-1.5">
+              {recents.map(r => {
+                const o = getStation(r.originId);
+                const d = getStation(r.destinationId);
+                if (!o || !d) return null;
+                return (
+                  <button
+                    key={`${r.originId}-${r.destinationId}`}
+                    type="button"
+                    onClick={() => pickRecent(r.originId, r.destinationId)}
+                    className="press flex w-full items-center gap-3 rounded-xl border border-border bg-card px-3.5 py-2.5 text-left"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <span className="block truncate text-[14px] font-semibold text-foreground">
+                        {o.name}
+                      </span>
+                      <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
+                        <IconArrowRight size={11} /> {d.name}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Mode toggle */}
         <div className="mb-3 flex rounded-xl border border-border bg-background p-1">
