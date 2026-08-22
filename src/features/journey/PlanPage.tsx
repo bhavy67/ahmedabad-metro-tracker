@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router';
-import { IconArrowsUpDown, IconClock, IconArrowsExchange, IconTicket, IconArrowRight, IconClockHour4 } from '@tabler/icons-react';
+import { Link, useSearchParams } from 'react-router';
+import { IconArrowsUpDown, IconClock, IconArrowsExchange, IconTicket, IconArrowRight, IconClockHour4, IconShare3, IconCheck } from '@tabler/icons-react';
 import { StationPicker } from './StationPicker.tsx';
 import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
 import { planJourney, planJourneyArriveBy } from '@/src/lib/metro/plan.ts';
@@ -39,6 +39,15 @@ export function PlanPage() {
   );
 
   const { recents, add: addRecent } = useRecentJourneys();
+  const [searchParams] = useSearchParams();
+
+  // Pre-fill pickers from shared URL (?from=id&to=id)
+  useEffect(() => {
+    const fromId = searchParams.get('from');
+    const toId = searchParams.get('to');
+    if (fromId) { const s = getStation(fromId); if (s) setOrigin(s); }
+    if (toId)   { const s = getStation(toId);   if (s) setDestination(s); }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Save to recents whenever a complete pair is selected
   useEffect(() => {
@@ -192,6 +201,19 @@ function EmptyState({ title, body }: { title: string; body: string }) {
 }
 
 function JourneyResult({ plan, mode }: { plan: NonNullable<ReturnType<typeof planJourney>>; mode: PlanMode }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleShare() {
+    const url = `${window.location.origin}/plan?from=${plan.originStationId}&to=${plan.destinationStationId}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Ahmedabad Metro journey', url }); } catch { /* cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-2.5">
@@ -274,11 +296,21 @@ function JourneyResult({ plan, mode }: { plan: NonNullable<ReturnType<typeof pla
         </ol>
       </div>
 
-      <Link to={`/station/${plan.originStationId}`} className="block">
-        <Button variant="outline" className="h-11 w-full text-sm">
-          View departure board at {requireStation(plan.originStationId).name}
-        </Button>
-      </Link>
+      <div className="flex gap-2">
+        <Link to={`/station/${plan.originStationId}`} className="min-w-0 flex-1">
+          <Button variant="outline" className="h-11 w-full text-sm">
+            Departure board · {requireStation(plan.originStationId).name}
+          </Button>
+        </Link>
+        <button
+          type="button"
+          onClick={handleShare}
+          aria-label="Share journey"
+          className="press flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          {copied ? <IconCheck size={18} className="text-primary" /> : <IconShare3 size={18} />}
+        </button>
+      </div>
     </div>
   );
 }
