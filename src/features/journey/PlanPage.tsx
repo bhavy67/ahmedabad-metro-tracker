@@ -3,37 +3,92 @@ import { Link } from 'react-router';
 import { IconArrowsUpDown, IconClock, IconArrowsExchange, IconTicket, IconArrowRight } from '@tabler/icons-react';
 import { StationPicker } from './StationPicker.tsx';
 import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
-import { planJourney } from '@/src/lib/metro/plan.ts';
+import { planJourney, planJourneyArriveBy } from '@/src/lib/metro/plan.ts';
 import { requireStation } from '@/src/lib/metro/network.ts';
 import { formatClockShort12 } from '@/src/lib/metro/clock.ts';
 import type { NetworkStation } from '@/src/lib/metro/types.ts';
 import { Button } from '@/components/ui/button';
 import CountUp from '@/components/CountUp.tsx';
+import { cn } from '@/lib/utils';
+
+type PlanMode = 'depart' | 'arrive';
+
+function secondsToHHMM(s: number): string {
+  const h = Math.floor(s / 3600) % 24;
+  const m = Math.floor((s % 3600) / 60);
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function parseHHMM(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map(Number);
+  return (h ?? 0) * 3600 + (m ?? 0) * 60;
+}
 
 export function PlanPage() {
   const [origin, setOrigin] = useState<NetworkStation | null>(null);
   const [destination, setDestination] = useState<NetworkStation | null>(null);
+  const [mode, setMode] = useState<PlanMode>('depart');
   const { secondsOfDay, dayOfWeek } = useMetroClock();
+
+  // Default arrive-by time: current time + 30 min, initialised lazily so it
+  // doesn't stale the moment the user switches tabs.
+  const [arriveByTime, setArriveByTime] = useState<string>(() =>
+    secondsToHHMM(secondsOfDay + 30 * 60)
+  );
 
   const plan = useMemo(() => {
     if (!origin || !destination) return undefined;
-    return planJourney(origin.id, destination.id, secondsOfDay, dayOfWeek);
-  }, [origin, destination, secondsOfDay, dayOfWeek]);
+    if (mode === 'depart') {
+      return planJourney(origin.id, destination.id, secondsOfDay, dayOfWeek);
+    }
+    return planJourneyArriveBy(origin.id, destination.id, parseHHMM(arriveByTime), dayOfWeek);
+  }, [origin, destination, secondsOfDay, dayOfWeek, mode, arriveByTime]);
+
+  function switchMode(next: PlanMode) {
+    if (next === 'arrive' && mode === 'depart') {
+      // Seed arrive-by with current time + 30 min when first switching
+      setArriveByTime(secondsToHHMM(secondsOfDay + 30 * 60));
+    }
+    setMode(next);
+  }
 
   return (
     <div className="pb-8">
       <div className="border-b border-border bg-card px-4 pb-5 pt-4">
         <h1 className="mb-4 font-display text-[22px] font-semibold tracking-tight">Plan your journey</h1>
+
+        {/* Mode toggle */}
+        <div className="mb-3 flex rounded-xl border border-border bg-background p-1">
+          <ModeTab label="Depart now" active={mode === 'depart'} onClick={() => switchMode('depart')} />
+          <ModeTab label="Arrive by" active={mode === 'arrive'} onClick={() => switchMode('arrive')} />
+        </div>
+
+        {/* Arrive-by time picker */}
+        {mode === 'arrive' && (
+          <div className="mb-3">
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Arrive by
+            </label>
+            <div className="relative">
+              <IconClock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="time"
+                value={arriveByTime}
+                onChange={e => setArriveByTime(e.target.value)}
+                className="h-11 w-full rounded-xl border border-border bg-card pl-10 pr-3 font-mono text-[15px] font-semibold text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Station pickers */}
         <div className="relative flex flex-col gap-2">
           <StationPicker label="From" icon="from" value={origin} onChange={setOrigin} exclude={destination?.id} />
           <StationPicker label="To" icon="to" value={destination} onChange={setDestination} exclude={origin?.id} />
           {origin && destination && (
             <button
               type="button"
-              onClick={() => {
-                setOrigin(destination);
-                setDestination(origin);
-              }}
+              onClick={() => { setOrigin(destination); setDestination(origin); }}
               aria-label="Swap origin and destination"
               className="press absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background shadow-md"
             >
@@ -54,10 +109,25 @@ export function PlanPage() {
         ) : !plan ? (
           <EmptyState title="No route found" body="No route is available between these stations right now." />
         ) : (
-          <JourneyResult plan={plan} />
+          <JourneyResult plan={plan} mode={mode} />
         )}
       </div>
     </div>
+  );
+}
+
+function ModeTab({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex-1 rounded-lg py-2 text-[13px] font-medium transition-colors',
+        active ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+      )}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -70,7 +140,7 @@ function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
-function JourneyResult({ plan }: { plan: NonNullable<ReturnType<typeof planJourney>> }) {
+function JourneyResult({ plan, mode }: { plan: NonNullable<ReturnType<typeof planJourney>>; mode: PlanMode }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-2.5">
@@ -81,7 +151,9 @@ function JourneyResult({ plan }: { plan: NonNullable<ReturnType<typeof planJourn
 
       {plan.isTomorrow && (
         <p className="rounded-xl border border-line-yellow/40 bg-line-yellow/10 px-3.5 py-2.5 text-[13px] font-medium text-foreground">
-          No more trains today — this is the first departure tomorrow morning.
+          {mode === 'arrive'
+            ? 'No connections reach your destination before this time today — showing tomorrow\'s schedule.'
+            : 'No more trains today — this is the first departure tomorrow morning.'}
         </p>
       )}
 
@@ -91,7 +163,9 @@ function JourneyResult({ plan }: { plan: NonNullable<ReturnType<typeof planJourn
             <span className="tnum font-mono text-[16px] font-semibold text-foreground">
               {formatClockShort12(plan.departSeconds)}
             </span>
-            <span className="text-[11px] uppercase text-muted-foreground">depart</span>
+            <span className="text-[11px] uppercase text-muted-foreground">
+              {mode === 'arrive' ? 'latest depart' : 'depart'}
+            </span>
           </div>
           <IconArrowRight size={16} className="text-muted-foreground" />
           <div className="flex items-baseline gap-1.5">
@@ -183,4 +257,3 @@ function StatCard({
     </div>
   );
 }
-
