@@ -154,14 +154,14 @@ export function HomePage() {
           </h2>
           <span className="text-[12px] text-muted-foreground">Tap to explore</span>
         </div>
-        <div className="scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1">
+        <div className="scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-2 lg:overflow-visible lg:snap-none">
           {LINE_IDS.map(line => {
             const l = network.lines[line];
             return (
               <Link
                 key={line}
                 to={`/line/${line}`}
-                className="press flex w-[68%] shrink-0 snap-start flex-col justify-between rounded-2xl p-4 shadow-sm"
+                className="press flex w-[68%] shrink-0 snap-start flex-col justify-between rounded-2xl p-4 shadow-sm lg:w-auto"
                 style={{
                   backgroundColor: `var(--line-${line})`,
                   color: `var(--line-${line}-ink)`,
