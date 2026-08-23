@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
-import { IconTrain, IconHome2, IconMap2, IconRoute, IconMapPin } from '@tabler/icons-react';
+import { IconTrain, IconHome2, IconMap2, IconRoute, IconMapPin, IconBuildingStore } from '@tabler/icons-react';
 import { useLiveTrains } from '@/src/hooks/useLiveTrains.ts';
 import { LINE_IDS, network } from '@/src/lib/metro/network.ts';
 import type { LineId } from '@/src/lib/metro/types.ts';
@@ -13,6 +13,7 @@ const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: IconHome2, match: (p: string) => p === '/' },
   { to: '/map', label: 'Live Map', icon: IconMap2, match: (p: string) => p.startsWith('/map') },
   { to: '/plan', label: 'Plan', icon: IconMapPin, match: (p: string) => p.startsWith('/plan') || p.startsWith('/station') },
+  { to: '/places', label: 'Places', icon: IconBuildingStore, match: (p: string) => p.startsWith('/places') },
 ];
 
 export function Sidebar() {

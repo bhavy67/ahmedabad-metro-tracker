@@ -195,8 +195,8 @@ function ActiveCommute({
                   />
                 )}
                 <span>{plan.durationMinutes} min</span>
-                {plan.transferCount > 0 && <span>· {plan.transferCount} transfer{plan.transferCount > 1 ? 's' : ''}</span>}
-                {plan.transferCount === 0 && <span>· direct</span>}
+                {plan.transferCount > 0 && <span>· {plan.transferCount} Transfer{plan.transferCount > 1 ? 's' : ''}</span>}
+                {plan.transferCount === 0 && <span>· Direct</span>}
               </div>
             </div>
             <Link
