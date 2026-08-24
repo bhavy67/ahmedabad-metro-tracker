@@ -6,6 +6,7 @@ import { HomePage } from '@/src/features/shell/pages/HomePage.tsx';
 import { LinePage } from '@/src/features/timeline/LinePage.tsx';
 import { StationPage } from '@/src/features/station/StationPage.tsx';
 import { PlanPage } from '@/src/features/journey/PlanPage.tsx';
+import { PlacesPage } from '@/src/features/places/PlacesPage.tsx';
 
 // maplibre-gl alone is ~800KB — split it into its own chunk so it only
 // downloads when someone actually opens the live map, not on first load.
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="line/:lineId" element={<LinePage />} />
             <Route path="station/:stationId" element={<StationPage />} />
             <Route path="plan" element={<PlanPage />} />
+            <Route path="places" element={<PlacesPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

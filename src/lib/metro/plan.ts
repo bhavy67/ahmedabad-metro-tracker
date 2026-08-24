@@ -150,6 +150,122 @@ function planForDay(
   return { arriveSeconds: earliestArrival.get(destinationStationId)!, legs };
 }
 
+/**
+ * Reverse CSA: given a target arrival time, find the latest possible departure
+ * from origin that still gets you to the destination on time.
+ * Scans connections in reverse departure-time order, propagating "latest
+ * start time" backwards from destination to origin.
+ */
+function planForDayReverse(
+  originStationId: string,
+  destinationStationId: string,
+  arriveBy: number,
+  connections: Connection[], // already sorted ascending by depTime
+): { departSeconds: number; legs: JourneyLeg[] } | null {
+  // latestStart[station] = latest time you can depart/be at that station and still reach dest by arriveBy
+  const latestStart = new Map<string, number>();
+  latestStart.set(destinationStationId, arriveBy);
+
+  // nextConn[station] = the connection to board FROM that station going forward
+  const nextConn = new Map<string, Connection>();
+
+  for (let i = connections.length - 1; i >= 0; i--) {
+    const conn = connections[i];
+
+    const latestAtArr = latestStart.get(conn.arrStationId);
+    if (latestAtArr === undefined) continue;
+    if (conn.arrTime > latestAtArr) continue;
+
+    // Transfer buffer check: if the onward connection from arr station is a different trip
+    const onward = nextConn.get(conn.arrStationId);
+    if (onward && onward.tripKey !== conn.tripKey) {
+      const buffer = transferBufferSeconds(conn.line, onward.line);
+      if (conn.arrTime + buffer > onward.depTime) continue;
+    }
+
+    const current = latestStart.get(conn.depStationId);
+    if (current === undefined || conn.depTime > current) {
+      latestStart.set(conn.depStationId, conn.depTime);
+      nextConn.set(conn.depStationId, conn);
+    }
+  }
+
+  if (!latestStart.has(originStationId)) return null;
+
+  // Reconstruct forward path by following nextConn from origin
+  const chain: Connection[] = [];
+  let cursor = originStationId;
+  while (cursor !== destinationStationId) {
+    const conn = nextConn.get(cursor);
+    if (!conn) break;
+    chain.push(conn);
+    cursor = conn.arrStationId;
+  }
+
+  const legs: JourneyLeg[] = [];
+  for (const conn of chain) {
+    const last = legs.at(-1);
+    if (last && last.tripKey === conn.tripKey) {
+      last.alightStationId = conn.arrStationId;
+      last.arriveSeconds = conn.arrTime;
+      last.stops.push(conn.arrStationId);
+    } else {
+      legs.push({
+        tripKey: conn.tripKey,
+        line: conn.line,
+        direction: conn.direction,
+        boardStationId: conn.depStationId,
+        alightStationId: conn.arrStationId,
+        departSeconds: conn.depTime,
+        arriveSeconds: conn.arrTime,
+        stops: [conn.depStationId, conn.arrStationId],
+      });
+    }
+  }
+
+  return { departSeconds: latestStart.get(originStationId)!, legs };
+}
+
+export function planJourneyArriveBy(
+  originStationId: string,
+  destinationStationId: string,
+  arriveBy: number,
+  dayOfWeek: number,
+  opts: { source?: PlanSource } = {},
+): JourneyPlan | null {
+  if (originStationId === destinationStationId) return null;
+  const source = opts.source ?? defaultSource;
+
+  const todayConns = buildConnections(dayOfWeek, source);
+  let result = planForDayReverse(originStationId, destinationStationId, arriveBy, todayConns);
+  let isTomorrow = false;
+
+  if (!result) {
+    const tomorrow = (dayOfWeek + 1) % 7;
+    const tomorrowConns = buildConnections(tomorrow, source);
+    result = planForDayReverse(originStationId, destinationStationId, arriveBy, tomorrowConns);
+    isTomorrow = true;
+  }
+
+  if (!result) return null;
+
+  const arriveSeconds = result.legs.at(-1)?.arriveSeconds ?? arriveBy;
+  const departSeconds = result.legs[0]?.departSeconds ?? result.departSeconds;
+  const totalStops = result.legs.reduce((sum, leg) => sum + leg.stops.length - 1, 0);
+
+  return {
+    originStationId,
+    destinationStationId,
+    departSeconds,
+    arriveSeconds,
+    durationMinutes: Math.round((arriveSeconds - departSeconds) / 60),
+    legs: result.legs,
+    transferCount: Math.max(0, result.legs.length - 1),
+    isTomorrow,
+    fare: fareForStations(totalStops),
+  };
+}
+
 export function planJourney(
   originStationId: string,
   destinationStationId: string,

@@ -5,6 +5,7 @@ import {
   IconMapPin,
   IconRoute,
   IconMap2,
+  IconBuildingStore,
   type Icon as TablerIcon,
 } from '@tabler/icons-react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
@@ -25,6 +26,7 @@ const TABS: TabDef[] = [
   { to: '/map', label: 'Live Map', icon: IconMap2, match: p => p.startsWith('/map'), kind: 'link' },
   { label: 'Lines', icon: IconRoute, match: p => p.startsWith('/line'), kind: 'lines' },
   { to: '/plan', label: 'Plan', icon: IconMapPin, match: p => p.startsWith('/plan') || p.startsWith('/station'), kind: 'link' },
+  { to: '/places', label: 'Places', icon: IconBuildingStore, match: p => p.startsWith('/places'), kind: 'link' },
 ];
 
 export function BottomTabBar() {
@@ -36,7 +38,7 @@ export function BottomTabBar() {
     <>
       <nav
         aria-label="Primary"
-        className="grid shrink-0 grid-cols-4 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur supports-backdrop-filter:bg-card/80"
+        className="grid shrink-0 grid-cols-5 border-t border-border bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur supports-backdrop-filter:bg-card/80"
       >
         {TABS.map(tab => {
           const active = tab.match(pathname);
