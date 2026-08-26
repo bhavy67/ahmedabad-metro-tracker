@@ -9,6 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "build:data": "bun scripts/build-network.ts && bun scripts/verify-network.ts",
+    "cache:bust": "bun scripts/cache-bust.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

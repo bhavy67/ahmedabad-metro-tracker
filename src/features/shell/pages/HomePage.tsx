@@ -10,6 +10,7 @@ import { DepartureBoard } from '@/src/features/station/DepartureBoard.tsx';
 import { LastTrainStrip } from '@/src/features/station/LastTrainStrip.tsx';
 import { CommuteCard } from '@/src/features/commute/CommuteCard.tsx';
 import { Button } from '@/components/ui/button';
+import { BuildFooter } from '@/src/features/pwa/BuildFooter.tsx';
 
 function greeting(secondsOfDay: number): string {
   const h = Math.floor(secondsOfDay / 3600);
@@ -191,6 +192,10 @@ export function HomePage() {
             );
           })}
         </div>
+      </section>
+
+      <section className="px-4 pt-8">
+        <BuildFooter />
       </section>
     </div>
   );
