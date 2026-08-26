@@ -16,6 +16,7 @@
  *      same wipe on demand. This is what to tell a single stuck user.
  */
 
+export const APP_VERSION: string = __APP_VERSION__;
 export const BUILD_ID: string = __BUILD_ID__;
 export const BUILD_TIME: string = __BUILD_TIME__;
 export const CACHE_EPOCH: number = __CACHE_EPOCH__;

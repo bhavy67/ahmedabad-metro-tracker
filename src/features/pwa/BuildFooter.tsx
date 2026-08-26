@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IconTrash, IconLoader2 } from '@tabler/icons-react';
-import { BUILD_ID, BUILD_TIME, CACHE_EPOCH, hardReset } from '@/src/lib/pwa/cacheBust.ts';
+import { APP_VERSION, BUILD_ID, BUILD_TIME, CACHE_EPOCH, hardReset } from '@/src/lib/pwa/cacheBust.ts';
 
 function buildDate(): string {
   const d = new Date(BUILD_TIME);
@@ -25,7 +25,7 @@ export function BuildFooter() {
   return (
     <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 pt-4 pb-2">
       <p className="tnum font-mono text-[11px] leading-relaxed text-muted-foreground">
-        Build {BUILD_ID} · cache v{CACHE_EPOCH}
+        v{APP_VERSION} · build {BUILD_ID} · cache v{CACHE_EPOCH}
         <br />
         {buildDate()}
       </p>

@@ -97,6 +97,29 @@ src/
 
 ---
 
+## Releasing
+
+```bash
+bun run release                    # patch bump (0.1.2 -> 0.1.3), then rebuild
+bun run release --minor            # 0.1.2 -> 0.2.0
+bun run release --major            # 0.1.2 -> 1.0.0
+bun run release --set 2.0.0-rc.1   # exact version
+bun run release --no-build         # bump only
+bun run release --show             # print the current version
+```
+
+The version is the human-facing label: it is stamped into the bundle and shown
+in the app footer next to the build id, so it is what a bug report should quote.
+It is deliberately *not* a cache lever — bumping it does not make installed
+clients throw anything away, because ordinary releases invalidate themselves
+through content hashing. When clients genuinely must discard their caches, run
+`bun run cache:bust` as well; the script says so when it finishes.
+
+If the build fails the bumped version is left in place — the build is the thing
+to fix, and silently reverting would hide which version was being built.
+
+---
+
 ## Caching & cache busting
 
 The app is a service-worker PWA, so a client can keep serving an old build long
