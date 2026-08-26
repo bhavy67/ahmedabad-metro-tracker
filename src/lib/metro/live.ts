@@ -77,6 +77,7 @@ function trainRunAt(trip: Trip, pattern: Pattern, elapsed: number, stationIds: (
       destinationStationId: stationId,
       originStationId: stationIds(pattern.st[0]),
       secondsToNextStop: 0,
+      secondsToNextArrival: 0,
       stopsRemaining: 0,
     };
   }
@@ -120,6 +121,7 @@ function trainRunAt(trip: Trip, pattern: Pattern, elapsed: number, stationIds: (
     destinationStationId: stationIds(pattern.st[lastIdx]),
     originStationId: stationIds(pattern.st[0]),
     secondsToNextStop,
+    secondsToNextArrival: arrAtTo - elapsed,
     stopsRemaining: lastIdx - i,
   };
 }

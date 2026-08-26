@@ -82,6 +82,16 @@ export interface TrainRun {
   progress: number;
   destinationStationId: string;
   originStationId: string;
+  /**
+   * While moving: seconds until arrival at `toStationId`. While dwelling:
+   * seconds until departure from `fromStationId`.
+   */
   secondsToNextStop: number;
+  /**
+   * Seconds until this train reaches `toStationId`, remaining dwell included —
+   * i.e. the ETA a rider standing at the next station cares about. Zero once
+   * the train is parked at its terminus.
+   */
+  secondsToNextArrival: number;
   stopsRemaining: number;
 }

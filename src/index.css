@@ -377,3 +377,50 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Persistent live-train labels on the map — next stop, ETA and whether the
+   train is sitting on a platform. Shown only past a zoom threshold (see
+   LABEL_MIN_ZOOM in MapPage); purely informational, so they never eat a
+   pointer event that belongs to the map or to the train marker underneath. */
+.metro-train-label {
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 148px;
+  padding: 3px 7px 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--metro-line, var(--primary));
+  background: color-mix(in oklch, var(--card) 92%, transparent);
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.18);
+  backdrop-filter: blur(4px);
+  font-size: 10px;
+  line-height: 1.25;
+  white-space: nowrap;
+  color: var(--card-foreground);
+}
+.metro-train-label-status {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+}
+/* Trains sitting on a platform get their line's color on the status line —
+   pulled toward the foreground so pale lines (yellow) still read on white. */
+.metro-train-label[data-status='dwelling'] .metro-train-label-status {
+  color: color-mix(in oklch, var(--metro-line, var(--primary)) 62%, var(--foreground));
+}
+.metro-train-label-next {
+  overflow: hidden;
+  font-weight: 650;
+  font-size: 11px;
+  text-overflow: ellipsis;
+}
+.metro-train-label-eta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
