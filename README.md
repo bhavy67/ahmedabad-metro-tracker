@@ -91,8 +91,51 @@ src/
 │   └── pwa/            # Install prompt, offline banner, update banner
 ├── hooks/              # useMetroClock, useLiveTrains, useNearestStation, etc.
 └── lib/
-    └── metro/          # Network data, timetable, CSA planner, fare logic
+    ├── metro/          # Network data, timetable, CSA planner, fare logic
+    └── pwa/            # Cache epoch guard and hard-reset helpers
 ```
+
+---
+
+## Caching & cache busting
+
+The app is a service-worker PWA, so a client can keep serving an old build long
+after a deploy. There are three levers, in increasing order of force.
+
+**1. Ordinary deploys — automatic.** Assets are content-hashed and the service
+worker swaps its precache on its own. `sw.js`, `index.html` and the manifest are
+served `must-revalidate` (see `vercel.json`) so the browser always re-checks the
+files that decide which build a client lands on; everything hashed is
+`immutable`. The app re-checks for a new service worker every 15 minutes, on
+regaining connectivity, and whenever it returns to the foreground — an installed
+PWA is resumed far more often than it is cold-started. When one is ready the
+update banner offers a one-tap reload.
+
+**2. Force every client to wipe — `bun run cache:bust`.**
+
+```bash
+bun run cache:bust                       # bump the epoch by one
+bun run cache:bust --reason "bad sw"     # bump, recording why
+bun run cache:bust --show                # print the current epoch, change nothing
+bun run cache:bust --set 12              # jump to a specific epoch
+```
+
+This bumps `epoch` in `cache-bust.json`. Commit it and deploy; then
+
+- every Workbox cache is renamed (`cacheId` in `vite.config.ts`), so the new
+  service worker cannot reuse a byte of the old precache, and
+- every already-installed client compares the built-in epoch against the one it
+  last booted with, and wipes Cache Storage plus its service workers before the
+  first paint — once, then reloads.
+
+It is blunt: clients re-download everything, including up to 3000 cached basemap
+tiles. Use it when a bad build is stuck on people's devices, not for routine
+releases.
+
+**3. One stuck user — no deploy needed.** Open any app URL with `?cachebust=1`,
+or tap **Clear cache & reload** in the footer of the home screen. Both run the
+same wipe on demand. The footer also shows the build id and cache epoch, which
+is what turns "it still shows the old version" into something diagnosable.
 
 ---
 
