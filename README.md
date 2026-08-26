@@ -8,6 +8,7 @@ A fast, offline-capable Progressive Web App for the Ahmedabad Metro network. Liv
 
 ### Live Network
 - **Live train positions** — every active train on the network shown on an interactive map, with heading indicators and crowd-level labels
+- **Persistent train labels** — zoom past the network overview and every train carries its own label: next station, live ETA, and whether it is sitting on a platform or running
 - **Per-line timeline** — scrollable timetable for each of the four lines (Blue, Red, Yellow, Violet)
 - **Station departure boards** — next departures with countdown timers and last-train warnings
 
@@ -36,7 +37,7 @@ These are implemented on a feature branch and will be merged shortly.
 | **Arrive by mode** | Flip the journey planner from "depart now" to "I need to arrive by X:XX" — uses a reverse Connection Scan Algorithm to find the latest possible departure |
 | **Recent journeys** | The planner remembers your last 3 origin–destination pairs for one-tap re-use |
 | **Share a journey** | Share any planned route as a deep link (`/plan?from=…&to=…`) — opens the planner pre-filled on the recipient's device |
-| **Commute mode** | Save a home and work station pair; a smart card on the home screen shows the next departure in the right direction based on time of day |
+| **Commute mode** | Save a home and work station pair; a card on the home screen shows the next departure home → work, with a one-tap flip to the return leg that is remembered |
 
 ---
 

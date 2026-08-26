@@ -4,9 +4,9 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { IconLocationBolt } from '@tabler/icons-react';
 import { buildLineFeatures, networkBounds } from '@/src/lib/metro/mapData.ts';
 import { runningTrips, positionOf } from '@/src/lib/metro/live.ts';
-import { currentEpochMs, istSecondsOfDay, istDayOfWeek } from '@/src/lib/metro/clock.ts';
+import { currentEpochMs, istSecondsOfDay, istDayOfWeek, formatCountdown } from '@/src/lib/metro/clock.ts';
 import { isClockOverridden } from '@/src/hooks/useMetroClock.ts';
-import { allStations, network } from '@/src/lib/metro/network.ts';
+import { allStations, network, requireStation } from '@/src/lib/metro/network.ts';
 import type { TrainRun } from '@/src/lib/metro/types.ts';
 import { TrainDetailSheet } from './TrainDetailSheet.tsx';
 import { StationPopoverCard } from './StationPopoverCard.tsx';
@@ -78,12 +78,56 @@ function trainMarkerEl(color: string): HTMLDivElement {
   return el;
 }
 
+/**
+ * Zoom at which every live train grows a persistent label. Below it the
+ * network is small enough on screen that labels would overlap into mush, so
+ * only the dots render and detail stays a tap away.
+ */
+const LABEL_MIN_ZOOM = 13;
+
+interface TrainLabel {
+  marker: Marker;
+  el: HTMLDivElement;
+  statusEl: HTMLElement;
+  nextEl: HTMLElement;
+  etaEl: HTMLElement;
+  /** Last rendered text, so a 60fps tick only touches the DOM when it changed. */
+  cache: string;
+}
+
+function trainLabelEl(color: string): HTMLDivElement {
+  const el = document.createElement('div');
+  el.className = 'metro-train-label';
+  el.style.setProperty('--metro-line', color);
+  el.innerHTML = `
+    <span class="metro-train-label-status"></span>
+    <span class="metro-train-label-next"></span>
+    <span class="metro-train-label-eta tnum"></span>
+  `;
+  return el;
+}
+
+/** The three lines of a train label: platform/running, next stop, ETA. */
+function labelContent(run: TrainRun): { status: string; next: string; eta: string } {
+  if (run.stopsRemaining === 0) {
+    // Parked at the terminus — there is no next stop to count down to.
+    return { status: 'At platform', next: `Terminus · ${requireStation(run.toStationId).name}`, eta: '—' };
+  }
+  return {
+    status: run.status === 'dwelling' ? 'At platform' : 'Running',
+    next: requireStation(run.toStationId).name,
+    eta: `ETA ${formatCountdown(run.secondsToNextArrival)}`,
+  };
+}
+
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export function MapPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MaplibreMap | null>(null);
   const trainMarkersRef = useRef<Map<string, { marker: Marker; line: string }>>(new Map());
+  const trainLabelsRef = useRef<Map<string, TrainLabel>>(new Map());
+  const labelsVisibleRef = useRef(false);
   const runsByKeyRef = useRef<Map<string, TrainRun>>(new Map());
   const selectedTrainRef = useRef<TrainRun | null>(null);
   const [ready, setReady] = useState(false);
@@ -141,10 +185,24 @@ export function MapPage() {
       new Marker({ element: el }).setLngLat([station.lng, station.lat]).addTo(map);
     }
 
+    // Persistent train labels are a zoom-level affordance: hidden while the
+    // whole network is in view, shown once the camera is close enough for them
+    // to sit apart from each other.
+    const syncLabelVisibility = () => {
+      const visible = map.getZoom() >= LABEL_MIN_ZOOM;
+      if (visible === labelsVisibleRef.current) return;
+      labelsVisibleRef.current = visible;
+      for (const label of trainLabelsRef.current.values()) {
+        label.el.style.display = visible ? '' : 'none';
+      }
+    };
+
     map.on('move', scheduleSyncLineOverlay);
     map.on('resize', scheduleSyncLineOverlay);
+    map.on('zoom', syncLabelVisibility);
     map.on('load', () => {
       syncLineOverlay();
+      syncLabelVisibility();
       setReady(true);
     });
 
@@ -189,11 +247,11 @@ export function MapPage() {
         for (const run of runs) {
           seen.add(run.tripKey);
           const pos = positionOf(run);
+          const color = network.lines[run.line].color;
           const existing = trainMarkersRef.current.get(run.tripKey);
           if (existing) {
             existing.marker.setLngLat([pos.lng, pos.lat]).setRotation(pos.bearingDeg);
           } else {
-            const color = network.lines[run.line].color;
             const el = trainMarkerEl(color);
             el.addEventListener('click', () => setSelectedTrain(runsByKeyRef.current.get(run.tripKey) ?? null));
             const marker = new Marker({
@@ -206,11 +264,53 @@ export function MapPage() {
               .addTo(map);
             trainMarkersRef.current.set(run.tripKey, { marker, line: run.line });
           }
+
+          // The label rides in its own marker rather than inside the train
+          // element: that one is rotated to the track bearing, and text that
+          // spins with the train is unreadable.
+          let label = trainLabelsRef.current.get(run.tripKey);
+          if (!label) {
+            const el = trainLabelEl(color);
+            el.style.display = labelsVisibleRef.current ? '' : 'none';
+            label = {
+              marker: new Marker({ element: el, anchor: 'top', offset: [0, 13] })
+                .setLngLat([pos.lng, pos.lat])
+                .addTo(map),
+              el,
+              statusEl: el.querySelector('.metro-train-label-status') as HTMLElement,
+              nextEl: el.querySelector('.metro-train-label-next') as HTMLElement,
+              etaEl: el.querySelector('.metro-train-label-eta') as HTMLElement,
+              cache: '',
+            };
+            trainLabelsRef.current.set(run.tripKey, label);
+          } else {
+            label.marker.setLngLat([pos.lng, pos.lat]);
+          }
+
+          // `!label.cache` covers a freshly created label: fill it even while
+          // hidden so it never flashes empty the moment the user zooms in.
+          if (labelsVisibleRef.current || !label.cache) {
+            const { status, next, eta } = labelContent(run);
+            const cache = `${status}|${next}|${eta}`;
+            if (cache !== label.cache) {
+              label.cache = cache;
+              label.el.dataset.status = run.status;
+              label.statusEl.textContent = status;
+              label.nextEl.textContent = next;
+              label.etaEl.textContent = eta;
+            }
+          }
         }
         for (const [tripKey, { marker }] of trainMarkersRef.current) {
           if (!seen.has(tripKey)) {
             marker.remove();
             trainMarkersRef.current.delete(tripKey);
+          }
+        }
+        for (const [tripKey, label] of trainLabelsRef.current) {
+          if (!seen.has(tripKey)) {
+            label.marker.remove();
+            trainLabelsRef.current.delete(tripKey);
           }
         }
 
