@@ -24,6 +24,13 @@ const cacheBust = JSON.parse(
     readFileSync(new URL('./cache-bust.json', import.meta.url), 'utf8'),
 ) as {epoch: number; bustedAt: string; reason: string}
 
+// The human-facing version, moved by `bun run release`. Unlike buildId it is
+// stable across rebuilds of the same release, so it is what a bug report should
+// quote first.
+const {version} = JSON.parse(
+    readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+) as {version: string}
+
 function gitShortSha(): string {
     try {
         return execFileSync('git', ['rev-parse', '--short', 'HEAD'], {stdio: ['ignore', 'pipe', 'ignore']})
@@ -41,6 +48,7 @@ const buildTime = new Date().toISOString()
 // https://vite.dev/config/
 export default defineConfig({
     define: {
+        __APP_VERSION__: JSON.stringify(version),
         __BUILD_ID__: JSON.stringify(buildId),
         __BUILD_TIME__: JSON.stringify(buildTime),
         __CACHE_EPOCH__: JSON.stringify(cacheBust.epoch),

@@ -5,6 +5,7 @@ export default defineConfig({
   // Mirrors the `define` block in vite.config.ts so modules that read the
   // build stamps are testable without standing up a real build.
   define: {
+    __APP_VERSION__: JSON.stringify('0.0.0-test'),
     __BUILD_ID__: JSON.stringify('test'),
     __BUILD_TIME__: JSON.stringify('1970-01-01T00:00:00.000Z'),
     __CACHE_EPOCH__: JSON.stringify(1),
@@ -12,6 +13,8 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     globals: false,
+    // scripts/ holds Bun CLIs; their pure helpers are unit-tested alongside src.
+    include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
   },
   resolve: {
     alias: { '@': path.resolve(import.meta.dirname, './') },
