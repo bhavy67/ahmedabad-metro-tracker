@@ -1,5 +1,6 @@
 import { IconBroadcast, IconClockHour4, IconAlertTriangle, IconCalendarEvent, type Icon as TablerIcon } from '@tabler/icons-react';
 import { timetableInfo } from '@/src/lib/metro/network.ts';
+import { APP_VERSION, BUILD_ID, CACHE_EPOCH } from '@/src/lib/pwa/cacheBust.ts';
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose } from '@/components/ui/drawer';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -63,6 +64,10 @@ export function LiveBadge() {
 
         <DrawerFooter className="pt-5">
           <DrawerClose className="pill-btn w-full justify-center px-5">Got it</DrawerClose>
+          {/* Build stamp for bug reports — out of the way, but one tap from anywhere. */}
+          <p className="tnum pt-1 text-center font-mono text-[10px] text-muted-foreground/70">
+            v{APP_VERSION} · build {BUILD_ID} · cache v{CACHE_EPOCH}
+          </p>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>

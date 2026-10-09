@@ -48,9 +48,11 @@ export function TopIsland({
 
   return (
     <header className="glass fixed top-[max(14px,env(safe-area-inset-top))] left-1/2 z-40 flex w-max max-w-[calc(100%-28px)] -translate-x-1/2 items-center gap-1 rounded-full p-1.5 shadow-lg">
-      <Link to="/" className="flex shrink-0 items-center gap-2 py-0.5 pr-3 pl-1.5" aria-label="Pulse home">
+      <Link to="/" className="flex shrink-0 items-center gap-2 py-0.5 pr-3 pl-1.5" aria-label="MetroNow home">
         <PulseLogo size={28} />
-        <span className="font-display text-[15px] font-semibold tracking-tight">Pulse</span>
+        <span className="font-display text-[15px] font-semibold tracking-tight">
+          Metro<span className="glow-text">Now</span>
+        </span>
       </Link>
 
       <nav ref={navRef} aria-label="Primary" className="relative hidden items-center gap-0.5 md:flex">

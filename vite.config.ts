@@ -65,8 +65,8 @@ export default defineConfig({
             includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
             manifest: {
                 id: '/',
-                name: 'Pulse — Ahmedabad Metro',
-                short_name: 'Pulse',
+                name: 'MetroNow — Ahmedabad Metro',
+                short_name: 'MetroNow',
                 description: 'Live train positions, timings and journey planning for the Ahmedabad Metro, computed from the official GMRC timetable.',
                 theme_color: '#050507',
                 background_color: '#050507',
