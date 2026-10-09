@@ -10,27 +10,26 @@ import {
 } from '@/components/ui/drawer';
 import { Bezel } from '@/components/Bezel.tsx';
 import { StationPicker } from '@/src/features/journey/StationPicker.tsx';
-import { useCommute } from '@/src/hooks/useCommute.ts';
+import { useCommute, type CommuteDirection } from '@/src/hooks/useCommute.ts';
 import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
 import { planJourney } from '@/src/lib/metro/plan.ts';
 import { getStation } from '@/src/lib/metro/network.ts';
 import { formatClockShort12 } from '@/src/lib/metro/clock.ts';
 import type { NetworkStation } from '@/src/lib/metro/types.ts';
 
-type Direction = 'to-work' | 'to-home';
-
 /** Countdown ring is full at this many seconds before departure and drains to zero. */
 const RING_WINDOW_SECONDS = 15 * 60;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 48;
 
 export function CommuteCard({ className, style }: { className?: string; style?: React.CSSProperties }) {
-  const { commute, save, clear } = useCommute();
+  const { commute, save, setDirection, clear } = useCommute();
   const { secondsOfDay, dayOfWeek } = useMetroClock();
 
-  // Smart default: morning → go to work, afternoon/evening → go home
-  const [direction, setDirection] = useState<Direction>(() =>
-    secondsOfDay < 13 * 3600 ? 'to-work' : 'to-home'
-  );
+  // The card always opens on the leg the user configured (home → work) and
+  // otherwise on whichever leg they last flipped to. It deliberately does not
+  // guess from the clock: a commute saved as A → B that renders as B → A
+  // reads as a bug, not as a convenience.
+  const direction: CommuteDirection = commute?.direction ?? 'to-work';
   const [setupOpen, setSetupOpen] = useState(false);
 
   // Setup drawer state
@@ -108,7 +107,7 @@ export function CommuteCard({ className, style }: { className?: string; style?: 
         direction={direction}
         secondsOfDay={secondsOfDay}
         dayOfWeek={dayOfWeek}
-        onFlip={() => setDirection(d => (d === 'to-work' ? 'to-home' : 'to-work'))}
+        onFlip={() => setDirection(direction === 'to-work' ? 'to-home' : 'to-work')}
         onEdit={openSetup}
         onClear={clear}
       />
@@ -124,7 +123,7 @@ function ActiveCommute({
   style?: React.CSSProperties;
   origin: NetworkStation;
   dest: NetworkStation;
-  direction: Direction;
+  direction: CommuteDirection;
   secondsOfDay: number;
   dayOfWeek: number;
   onFlip: () => void;

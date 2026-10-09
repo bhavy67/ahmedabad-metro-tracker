@@ -1,6 +1,7 @@
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import { requireStation, network } from '@/src/lib/metro/network.ts';
 import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
+import { formatCountdown } from '@/src/lib/metro/clock.ts';
 import { estimateCrowd } from '@/src/lib/metro/crowd.ts';
 import type { TrainRun } from '@/src/lib/metro/types.ts';
 
@@ -48,7 +49,12 @@ export function TrainDetailSheet({ run, open, onOpenChange }: { run: TrainRun | 
         </DrawerHeader>
         <div className="mx-4 mt-3 mb-6 surface rounded-[20px] px-4 py-1">
           <Row label="Status" value={run.status === 'dwelling' ? 'At platform' : 'En route'} />
-          <Row label="Next stop in" value={`${Math.max(0, Math.round(run.secondsToNextStop))}s`} />
+          {run.stopsRemaining > 0 && (
+            <Row label={`Reaches ${to.name} in`} value={formatCountdown(run.secondsToNextArrival)} />
+          )}
+          {run.status === 'dwelling' && run.stopsRemaining > 0 && (
+            <Row label="Departs in" value={formatCountdown(run.secondsToNextStop)} />
+          )}
           <Row label="Started from" value={requireStation(run.originStationId).name} />
         </div>
       </DrawerContent>

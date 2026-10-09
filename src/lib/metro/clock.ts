@@ -113,3 +113,13 @@ export function formatScheduleTime12(hhmm: string): string {
   if (Number.isNaN(h) || Number.isNaN(m)) return hhmm;
   return formatClockShort12(h * 3600 + m * 60);
 }
+
+/**
+ * Short live countdown — `45s`, `2m 05s`. Used wherever a train's ETA is shown
+ * ticking (map labels, train detail sheet) so those surfaces read alike.
+ */
+export function formatCountdown(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  if (total < 60) return `${total}s`;
+  return `${Math.floor(total / 60)}m ${String(total % 60).padStart(2, '0')}s`;
+}

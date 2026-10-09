@@ -11,6 +11,7 @@ import { LastTrainStrip } from '@/src/features/station/LastTrainStrip.tsx';
 import { CommuteCard } from '@/src/features/commute/CommuteCard.tsx';
 import { NetworkPulse } from '@/src/features/map/NetworkPulse.tsx';
 import { Bezel } from '@/components/Bezel.tsx';
+import { BuildFooter } from '@/src/features/pwa/BuildFooter.tsx';
 
 function greeting(secondsOfDay: number): string {
   const h = Math.floor(secondsOfDay / 3600);
@@ -146,6 +147,10 @@ export function HomePage() {
             );
           })}
         </div>
+      </section>
+
+      <section className="mt-10">
+        <BuildFooter />
       </section>
     </div>
   );
