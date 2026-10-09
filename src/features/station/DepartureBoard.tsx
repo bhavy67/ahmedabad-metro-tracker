@@ -15,11 +15,11 @@ export function DepartureBoard({ stationId, limit = 6 }: { stationId: string; li
   );
 
   if (departures.length === 0) {
-    return <p className="px-1 py-4 text-sm text-muted-foreground">No more departures scheduled from here today.</p>;
+    return <p className="px-3 py-5 text-[14px] text-muted-foreground">No more departures scheduled from here today.</p>;
   }
 
   return (
-    <ul className="divide-y divide-border">
+    <ul className="flex flex-col">
       {departures.map((dep, i) => (
         <DepartureRow key={`${dep.tripKey}-${dep.direction}`} dep={dep} index={i} />
       ))}
@@ -33,37 +33,43 @@ function DepartureRow({ dep, index }: { dep: UpcomingDeparture; index: number })
 
   return (
     <li
-      className={cn('row-fade-in flex items-center gap-3 py-3', imminent && 'rounded-lg bg-primary/8')}
+      className={cn(
+        'row-fade-in flex items-center gap-3 rounded-[18px] px-3 py-2.5 transition-colors duration-300 hover:bg-white/4',
+        imminent && 'bg-live/6'
+      )}
       style={{ animationDelay: `${index * 45}ms` }}
     >
       <span
-        className="h-10 w-1 shrink-0 rounded-full"
-        style={{ backgroundColor: `var(--line-${dep.line})` }}
+        className="h-9 w-2 shrink-0 rounded-full"
+        style={{ backgroundColor: `var(--line-${dep.line})`, boxShadow: `0 0 14px var(--line-${dep.line})` }}
         aria-hidden
       />
       <div className="min-w-0 flex-1">
         <Link
           to={`/station/${destination.id}`}
-          className="flex items-center gap-1.5 text-[15px] font-semibold text-foreground hover:underline"
+          className="flex items-center gap-1 text-[15px] font-bold text-foreground hover:underline"
         >
-          <IconArrowRight size={14} className="shrink-0 text-muted-foreground" />
+          <IconArrowRight size={14} stroke={1.75} className="shrink-0 text-muted-foreground" />
           <span className="truncate">{destination.name}</span>
         </Link>
-        <p className="mt-0.5 text-[12px] text-muted-foreground">
+        <p className="tnum mt-0.5 font-mono text-[12px] text-muted-foreground">
           {dep.isTomorrow ? 'Tomorrow · ' : ''}
           {formatClockShort12(dep.departureSeconds)}
         </p>
       </div>
-      <div className={cn('tnum shrink-0 text-right font-mono', imminent ? 'text-primary' : 'text-foreground')}>
+      <div className="tnum shrink-0 text-right">
         {dep.isTomorrow ? (
-          <span className="text-[15px] font-semibold">{formatHours(dep.minutesAway)}</span>
+          <span className="font-mono text-[15px] font-semibold">{formatHours(dep.minutesAway)}</span>
         ) : dep.minutesAway <= 0 ? (
-          <span className="text-[15px] font-bold uppercase">Now</span>
+          <span className="block font-display text-[22px] leading-none font-medium text-live [text-shadow:0_0_18px_rgb(92_242_181/0.55)]">
+            Now
+            <small className="mt-1 block font-sans text-[10px] font-bold tracking-[0.14em] text-muted-foreground">BOARD</small>
+          </span>
         ) : (
-          <>
-            <span className="text-[18px] font-bold leading-none">{dep.minutesAway}</span>{' '}
-            <span className="text-[11px] font-medium uppercase text-muted-foreground">min</span>
-          </>
+          <span className={cn('block font-display text-[24px] leading-none font-medium tracking-[-0.04em]', imminent && 'text-live')}>
+            {dep.minutesAway}
+            <small className="mt-1 block font-sans text-[10px] font-bold tracking-[0.14em] text-muted-foreground">MIN</small>
+          </span>
         )}
       </div>
     </li>

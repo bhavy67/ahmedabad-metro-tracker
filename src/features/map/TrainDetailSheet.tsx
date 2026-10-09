@@ -6,9 +6,9 @@ import type { TrainRun } from '@/src/lib/metro/types.ts';
 
 const CROWD_LABEL = { low: 'Light', moderate: 'Moderate', heavy: 'Crowded' } as const;
 const CROWD_TONE = {
-  low: 'text-emerald-500 bg-emerald-500/12',
-  moderate: 'text-amber-500 bg-amber-500/12',
-  heavy: 'text-red-500 bg-red-500/12',
+  low: 'text-live bg-live/12',
+  moderate: 'text-line-yellow bg-line-yellow/12',
+  heavy: 'text-destructive bg-destructive/12',
 } as const;
 
 export function TrainDetailSheet({ run, open, onOpenChange }: { run: TrainRun | null; open: boolean; onOpenChange: (open: boolean) => void }) {
@@ -26,17 +26,18 @@ export function TrainDetailSheet({ run, open, onOpenChange }: { run: TrainRun | 
       <DrawerContent>
         <DrawerHeader>
           <div className="mb-2 flex items-center gap-2">
-            <span
-              className="rounded-full px-2.5 py-0.5 font-display text-[11px] font-bold uppercase tracking-wide"
-              style={{ backgroundColor: `var(--line-${run.line})`, color: `var(--line-${run.line}-ink)` }}
-            >
-              {lineMeta.name} Line
+            <span className="surface inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.14em] uppercase">
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: `var(--line-${run.line})`, boxShadow: `0 0 10px var(--line-${run.line})` }}
+              />
+              {lineMeta.name}
             </span>
-            <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${CROWD_TONE[crowd]}`}>
+            <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${CROWD_TONE[crowd]}`}>
               {CROWD_LABEL[crowd]}
             </span>
           </div>
-          <DrawerTitle className="font-display text-[20px] font-semibold leading-tight">
+          <DrawerTitle className="text-[22px] leading-tight">
             To {destination.name}
           </DrawerTitle>
           <DrawerDescription className="text-[13px]">
@@ -45,7 +46,7 @@ export function TrainDetailSheet({ run, open, onOpenChange }: { run: TrainRun | 
             {run.stopsRemaining} stop{run.stopsRemaining === 1 ? '' : 's'} to go
           </DrawerDescription>
         </DrawerHeader>
-        <div className="space-y-1 px-4 pb-6 pt-2">
+        <div className="mx-4 mt-3 mb-6 surface rounded-[20px] px-4 py-1">
           <Row label="Status" value={run.status === 'dwelling' ? 'At platform' : 'En route'} />
           <Row label="Next stop in" value={`${Math.max(0, Math.round(run.secondsToNextStop))}s`} />
           <Row label="Started from" value={requireStation(run.originStationId).name} />
@@ -57,7 +58,7 @@ export function TrainDetailSheet({ run, open, onOpenChange }: { run: TrainRun | 
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between border-b border-border py-2.5 text-[14px] last:border-0">
+    <div className="flex items-center justify-between border-b border-border py-3 text-[14px] last:border-0">
       <span className="text-muted-foreground">{label}</span>
       <span className="tnum font-mono font-semibold text-foreground">{value}</span>
     </div>

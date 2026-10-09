@@ -1,17 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { IconArrowsUpDown, IconClock, IconArrowsExchange, IconTicket, IconArrowRight, IconClockHour4, IconShare3, IconCheck } from '@tabler/icons-react';
+import {
+  IconArrowsUpDown, IconClock, IconArrowsExchange, IconTicket, IconArrowRight, IconClockHour4,
+  IconShare3, IconCheck, IconArrowUpRight, IconRoute,
+} from '@tabler/icons-react';
 import { StationPicker } from './StationPicker.tsx';
 import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
 import { planJourney, planJourneyArriveBy } from '@/src/lib/metro/plan.ts';
-import { requireStation } from '@/src/lib/metro/network.ts';
+import { requireStation, getStation } from '@/src/lib/metro/network.ts';
 import { formatClockShort12 } from '@/src/lib/metro/clock.ts';
 import type { NetworkStation } from '@/src/lib/metro/types.ts';
-import { Button } from '@/components/ui/button';
+import { Bezel } from '@/components/Bezel.tsx';
 import CountUp from '@/components/CountUp.tsx';
 import { cn } from '@/lib/utils';
 import { useRecentJourneys } from '@/src/hooks/useRecentJourneys.ts';
-import { getStation } from '@/src/lib/metro/network.ts';
 
 type PlanMode = 'depart' | 'arrive';
 
@@ -79,90 +81,98 @@ export function PlanPage() {
     setMode(next);
   }
 
+  const showRecents = recents.length > 0 && !origin && !destination;
+
   return (
-    <div className="pb-8">
-      <div className="border-b border-border bg-card px-4 pb-5 pt-4">
-        <h1 className="mb-4 font-display text-[22px] font-semibold tracking-tight">Plan your journey</h1>
+    <div className="mx-auto grid w-full max-w-[1240px] gap-3.5 px-3.5 md:px-7 lg:grid-cols-12 lg:items-start">
+      <div className="flex flex-col gap-3.5 lg:sticky lg:top-0 lg:col-span-5">
+        <header className="rise px-1.5 pb-2">
+          <span className="eyebrow">
+            <IconRoute size={11} /> Journey planner
+          </span>
+          <h1 className="mt-4 font-display text-[clamp(2rem,7.6vw,3rem)] leading-[1.02] font-medium tracking-[-0.045em]">
+            Plan a <span className="glow-text">journey.</span>
+          </h1>
+        </header>
 
-        {/* Recent journeys — shown as quick-picks when pickers are empty */}
-        {recents.length > 0 && !origin && !destination && (
-          <div className="mb-4">
-            <p className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              <IconClockHour4 size={13} stroke={2} /> Recent
-            </p>
-            <div className="space-y-1.5">
-              {recents.map(r => {
-                const o = getStation(r.originId);
-                const d = getStation(r.destinationId);
-                if (!o || !d) return null;
-                return (
-                  <button
-                    key={`${r.originId}-${r.destinationId}`}
-                    type="button"
-                    onClick={() => pickRecent(r.originId, r.destinationId)}
-                    className="press flex w-full items-center gap-3 rounded-xl border border-border bg-card px-3.5 py-2.5 text-left"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <span className="block truncate text-[14px] font-semibold text-foreground">
-                        {o.name}
-                      </span>
-                      <span className="flex items-center gap-1 text-[12px] text-muted-foreground">
-                        <IconArrowRight size={11} /> {d.name}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+        <Bezel className="rise" style={{ '--i': 1 } as React.CSSProperties}>
+          {/* Mode toggle with a sliding thumb */}
+          <div className="surface relative mb-4 grid grid-cols-2 rounded-full p-1">
+            <span
+              aria-hidden
+              className={cn(
+                'absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full bg-white/12 transition-transform duration-500 ease-(--spring)',
+                mode === 'arrive' && 'translate-x-full'
+              )}
+            />
+            <ModeTab label="Depart now" active={mode === 'depart'} onClick={() => switchMode('depart')} />
+            <ModeTab label="Arrive by" active={mode === 'arrive'} onClick={() => switchMode('arrive')} />
           </div>
-        )}
 
-        {/* Mode toggle */}
-        <div className="mb-3 flex rounded-xl border border-border bg-background p-1">
-          <ModeTab label="Depart now" active={mode === 'depart'} onClick={() => switchMode('depart')} />
-          <ModeTab label="Arrive by" active={mode === 'arrive'} onClick={() => switchMode('arrive')} />
-        </div>
-
-        {/* Arrive-by time picker */}
-        {mode === 'arrive' && (
-          <div className="mb-3">
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              Arrive by
+          {mode === 'arrive' && (
+            <label className="surface row-fade-in mb-3 flex items-center gap-3 rounded-[20px] px-4 py-2.5 transition-colors focus-within:border-primary/60 focus-within:bg-primary/6">
+              <IconClock size={18} stroke={1.75} className="shrink-0 text-muted-foreground" />
+              <span className="flex-1">
+                <span className="block text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">Arrive by</span>
+                <input
+                  type="time"
+                  value={arriveByTime}
+                  onChange={e => setArriveByTime(e.target.value)}
+                  className="w-full bg-transparent font-mono text-[16px] font-medium text-foreground outline-none"
+                />
+              </span>
             </label>
-            <div className="relative">
-              <IconClock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="time"
-                value={arriveByTime}
-                onChange={e => setArriveByTime(e.target.value)}
-                className="h-11 w-full rounded-xl border border-border bg-card pl-10 pr-3 font-mono text-[15px] font-semibold text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Station pickers */}
-        <div className="relative flex flex-col gap-2">
-          <StationPicker label="From" icon="from" value={origin} onChange={setOrigin} exclude={destination?.id} />
-          <StationPicker label="To" icon="to" value={destination} onChange={setDestination} exclude={origin?.id} />
-          {origin && destination && (
-            <button
-              type="button"
-              onClick={() => { setOrigin(destination); setDestination(origin); }}
-              aria-label="Swap origin and destination"
-              className="press absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background shadow-md"
-            >
-              <IconArrowsUpDown size={16} />
-            </button>
           )}
-        </div>
+
+          <div className="relative flex flex-col gap-2">
+            <StationPicker label="From" icon="from" value={origin} onChange={setOrigin} exclude={destination?.id} />
+            <StationPicker label="To" icon="to" value={destination} onChange={setDestination} exclude={origin?.id} />
+            {origin && destination && (
+              <button
+                type="button"
+                onClick={() => { setOrigin(destination); setDestination(origin); }}
+                aria-label="Swap origin and destination"
+                className="absolute top-1/2 right-12 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border-strong bg-[#16161D] transition-transform duration-600 ease-(--spring) hover:rotate-180"
+              >
+                <IconArrowsUpDown size={16} stroke={1.75} />
+              </button>
+            )}
+          </div>
+
+          {showRecents && (
+            <div className="mt-5">
+              <p className="mb-2 flex items-center gap-1.5 px-1 text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">
+                <IconClockHour4 size={13} stroke={1.75} /> Recent
+              </p>
+              <div className="flex flex-col gap-1.5">
+                {recents.map(r => {
+                  const o = getStation(r.originId);
+                  const d = getStation(r.destinationId);
+                  if (!o || !d) return null;
+                  return (
+                    <button
+                      key={`${r.originId}-${r.destinationId}`}
+                      type="button"
+                      onClick={() => pickRecent(r.originId, r.destinationId)}
+                      className="press surface surface-hover flex w-full items-center gap-2 rounded-[18px] px-4 py-3 text-left text-[14px] font-bold"
+                    >
+                      <span className="truncate">{o.name}</span>
+                      <IconArrowRight size={14} stroke={1.75} className="shrink-0 text-muted-foreground" />
+                      <span className="truncate">{d.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </Bezel>
       </div>
 
-      <div className="px-4 pt-5">
+      <div className="lg:col-span-7">
         {!origin || !destination ? (
           <EmptyState
             title="Choose two stations"
-            body="Pick an origin and destination to see the fastest route, fare and transfers."
+            body="Pick an origin and destination to see the fastest route, fare and changes."
           />
         ) : origin.id === destination.id ? (
           <EmptyState title="Pick two different stations" body="Origin and destination need to be different." />
@@ -181,9 +191,10 @@ function ModeTab({ label, active, onClick }: { label: string; active: boolean; o
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={cn(
-        'flex-1 rounded-lg py-2 text-[13px] font-medium transition-colors',
-        active ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+        'relative rounded-full py-2.5 text-[13px] font-bold transition-colors duration-300',
+        active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
       )}
     >
       {label}
@@ -193,10 +204,16 @@ function ModeTab({ label, active, onClick }: { label: string; active: boolean; o
 
 function EmptyState({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border-strong bg-card-muted/40 px-6 py-10 text-center">
-      <p className="font-display text-[16px] font-semibold text-foreground">{title}</p>
-      <p className="mx-auto mt-1 max-w-[32ch] text-[13px] text-muted-foreground">{body}</p>
-    </div>
+    <Bezel className="rise" style={{ '--i': 2 } as React.CSSProperties} coreClassName="flex flex-col items-center px-6 py-12 text-center lg:py-20">
+      <span
+        className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/14 text-primary"
+        style={{ boxShadow: '0 0 40px -6px var(--primary)' }}
+      >
+        <IconRoute size={22} stroke={1.5} />
+      </span>
+      <p className="font-display text-[18px] font-medium tracking-tight">{title}</p>
+      <p className="mx-auto mt-1.5 max-w-[32ch] text-[13px] text-muted-foreground">{body}</p>
+    </Bezel>
   );
 }
 
@@ -215,100 +232,87 @@ function JourneyResult({ plan, mode }: { plan: NonNullable<ReturnType<typeof pla
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-2.5">
+    <div className="flex flex-col gap-3.5">
+      <div className="rise grid grid-cols-3 gap-2.5" style={{ '--i': 2 } as React.CSSProperties}>
         <StatCard icon={IconClock} label="Duration" value={plan.durationMinutes} suffix=" min" />
-        <StatCard icon={IconArrowsExchange} label="Transfers" value={plan.transferCount} />
+        <StatCard icon={IconArrowsExchange} label="Changes" value={plan.transferCount} />
         <StatCard icon={IconTicket} label="Fare" value={plan.fare} prefix="₹" />
       </div>
 
       {plan.isTomorrow && (
-        <p className="rounded-xl border border-line-yellow/40 bg-line-yellow/10 px-3.5 py-2.5 text-[13px] font-medium text-foreground">
+        <p className="rounded-[20px] border border-line-yellow/30 bg-line-yellow/8 px-4 py-3 text-[13px] font-semibold">
           {mode === 'arrive'
             ? 'No connections reach your destination before this time today — showing tomorrow\'s schedule.'
             : 'No more trains today — this is the first departure tomorrow morning.'}
         </p>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-        <div className="flex items-center justify-between border-b border-border bg-card-muted/40 px-4 py-3 text-[14px]">
-          <div className="flex items-baseline gap-1.5">
-            <span className="tnum font-mono text-[16px] font-semibold text-foreground">
+      <Bezel className="rise" coreClassName="p-0 md:p-0" style={{ '--i': 3 } as React.CSSProperties}>
+        <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
+          <div>
+            <span className="block text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">
+              {mode === 'arrive' ? 'Latest depart' : 'Depart'}
+            </span>
+            <span className="tnum font-display text-[22px] font-medium tracking-[-0.03em]">
               {formatClockShort12(plan.departSeconds)}
             </span>
-            <span className="text-[11px] uppercase text-muted-foreground">
-              {mode === 'arrive' ? 'latest depart' : 'depart'}
-            </span>
           </div>
-          <IconArrowRight size={16} className="text-muted-foreground" />
-          <div className="flex items-baseline gap-1.5">
-            <span className="tnum font-mono text-[16px] font-semibold text-foreground">
+          <span className="mx-2 h-px flex-1 bg-gradient-to-r from-white/5 via-white/25 to-white/5" />
+          <div className="text-right">
+            <span className="block text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">Arrive</span>
+            <span className="tnum font-display text-[22px] font-medium tracking-[-0.03em]">
               {formatClockShort12(plan.arriveSeconds)}
             </span>
-            <span className="text-[11px] uppercase text-muted-foreground">arrive</span>
           </div>
         </div>
 
-        <ol className="space-y-4 p-4">
+        <ol className="flex flex-col gap-4 p-5">
           {plan.legs.map((leg, i) => {
             const board = requireStation(leg.boardStationId);
             const alight = requireStation(leg.alightStationId);
             return (
-              <li key={leg.tripKey}>
+              <li key={leg.tripKey} className="row-fade-in" style={{ animationDelay: `${i * 80}ms` }}>
                 {i > 0 && (
-                  <div className="mb-3 flex items-center gap-1.5 pl-1 text-[12px] font-medium text-muted-foreground">
-                    <IconArrowsExchange size={13} /> Change at {board.name}
+                  <div className="surface mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold text-muted-foreground">
+                    <IconArrowsExchange size={13} stroke={1.75} /> Change at {board.name}
                   </div>
                 )}
-                <div className="flex gap-3">
-                  <div className="flex flex-col items-center pt-1">
-                    <span
-                      className="h-3 w-3 rounded-full border-2 border-background"
-                      style={{ backgroundColor: `var(--line-${leg.line})` }}
-                    />
+                <div className="flex gap-3.5">
+                  <div className="flex flex-col items-center pt-1.5">
+                    <span className="h-3 w-3 rounded-full border-[3px] bg-[#0E0E14]" style={{ borderColor: `var(--line-${leg.line})` }} />
                     <span
                       className="my-1 w-[3px] flex-1 rounded-full"
-                      style={{ backgroundColor: `var(--line-${leg.line})`, minHeight: 34, opacity: 0.85 }}
+                      style={{ backgroundColor: `var(--line-${leg.line})`, boxShadow: `0 0 10px var(--line-${leg.line})`, minHeight: 40 }}
                     />
-                    <span
-                      className="h-3 w-3 rounded-full border-2 border-background"
-                      style={{ backgroundColor: `var(--line-${leg.line})` }}
-                    />
+                    <span className="h-3 w-3 rounded-full border-[3px] bg-[#0E0E14]" style={{ borderColor: `var(--line-${leg.line})` }} />
                   </div>
-                  <div className="flex-1 pb-1">
-                    <p className="text-[15px] font-semibold">{board.name}</p>
-                    <p
-                      className="my-1.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
-                      style={{
-                        color: `var(--line-${leg.line}-ink)`,
-                        backgroundColor: `var(--line-${leg.line})`,
-                      }}
-                    >
-                      <IconArrowRight size={11} /> {leg.stops.length - 1} stop
-                      {leg.stops.length - 1 === 1 ? '' : 's'} · {Math.round((leg.arriveSeconds - leg.departSeconds) / 60)} min
+                  <div className="flex-1">
+                    <p className="text-[15px] font-bold">{board.name}</p>
+                    <p className="my-2 inline-flex items-center gap-2 text-[12px] font-semibold text-muted-foreground">
+                      <span className="tnum rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide uppercase" style={{ color: `var(--line-${leg.line}-ink)`, backgroundColor: `var(--line-${leg.line})` }}>
+                        {leg.line}
+                      </span>
+                      {leg.stops.length - 1} stop{leg.stops.length - 1 === 1 ? '' : 's'} ·{' '}
+                      {Math.round((leg.arriveSeconds - leg.departSeconds) / 60)} min
                     </p>
-                    <p className="text-[15px] font-semibold">{alight.name}</p>
+                    <p className="text-[15px] font-bold">{alight.name}</p>
                   </div>
                 </div>
               </li>
             );
           })}
         </ol>
-      </div>
+      </Bezel>
 
-      <div className="flex gap-2">
-        <Link to={`/station/${plan.originStationId}`} className="min-w-0 flex-1">
-          <Button variant="outline" className="h-11 w-full text-sm">
-            Departure board · {requireStation(plan.originStationId).name}
-          </Button>
+      <div className="rise flex flex-wrap gap-2" style={{ '--i': 4 } as React.CSSProperties}>
+        <Link to={`/station/${plan.originStationId}`} className="pill-btn min-w-0 flex-1 sm:flex-none">
+          <span className="truncate">Departures · {requireStation(plan.originStationId).name}</span>
+          <span className="knob">
+            <IconArrowUpRight size={17} stroke={1.75} />
+          </span>
         </Link>
-        <button
-          type="button"
-          onClick={handleShare}
-          aria-label="Share journey"
-          className="press flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground"
-        >
-          {copied ? <IconCheck size={18} className="text-primary" /> : <IconShare3 size={18} />}
+        <button type="button" onClick={handleShare} aria-label="Share journey" className="pill-btn ghost px-1.5">
+          <span className="knob">{copied ? <IconCheck size={17} className="text-live" /> : <IconShare3 size={17} stroke={1.75} />}</span>
         </button>
       </div>
     </div>
@@ -329,14 +333,14 @@ function StatCard({
   suffix?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card px-3 py-3 text-center shadow-sm">
-      <Icon size={16} className="mx-auto mb-1.5 text-muted-foreground" />
-      <p className="tnum flex items-baseline justify-center font-mono text-[17px] font-bold text-foreground">
+    <div className="surface rounded-[22px] px-3 py-4 text-center">
+      <Icon size={17} stroke={1.5} className="mx-auto mb-2 text-muted-foreground" />
+      <p className="tnum flex items-baseline justify-center font-display text-[20px] font-medium tracking-[-0.03em]">
         {prefix}
         <CountUp to={value} duration={0.6} />
-        {suffix}
+        <span className="text-[13px] text-muted-foreground">{suffix}</span>
       </p>
-      <p className="mt-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-1 text-[10px] font-bold tracking-[0.14em] text-muted-foreground uppercase">{label}</p>
     </div>
   );
 }

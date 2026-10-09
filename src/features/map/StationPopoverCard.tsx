@@ -15,9 +15,12 @@ export function StationPopoverCard({ stationId, onClose }: { stationId: string; 
             {station.lines.map(line => (
               <span
                 key={line}
-                className="inline-block rounded-full px-2 py-0.5 font-display text-[11px] font-bold uppercase tracking-wide"
-                style={{ backgroundColor: `var(--line-${line})`, color: `var(--line-${line}-ink)` }}
+                className="surface inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.14em] uppercase"
               >
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: `var(--line-${line})`, boxShadow: `0 0 10px var(--line-${line})` }}
+                />
                 {network.lines[line].name}
               </span>
             ))}
@@ -30,19 +33,19 @@ export function StationPopoverCard({ stationId, onClose }: { stationId: string; 
               <IconBuildingArch size={12} /> {station.isUnderground ? 'Underground' : 'Elevated'}
             </span>
           </div>
-          <DrawerTitle className="font-display text-[20px] font-semibold leading-tight">
+          <DrawerTitle className="text-[22px] leading-tight">
             {station.name}
           </DrawerTitle>
         </DrawerHeader>
-        <div className="px-4 pb-3">
+        <div className="min-h-0 overflow-y-auto px-2 pt-2 pb-3">
           <DepartureBoard stationId={station.id} limit={5} />
         </div>
         <div className="px-4 pb-5">
-          <Link
-            to={`/station/${station.id}`}
-            className="press flex items-center justify-center gap-1 rounded-xl border border-border bg-card px-4 py-3 text-[14px] font-medium text-foreground"
-          >
-            Open station <IconArrowRight size={15} />
+          <Link to={`/station/${station.id}`} className="pill-btn w-full">
+            Open station
+            <span className="knob">
+              <IconArrowRight size={17} stroke={1.75} />
+            </span>
           </Link>
         </div>
       </DrawerContent>

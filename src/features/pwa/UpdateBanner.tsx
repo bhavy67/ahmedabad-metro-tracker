@@ -6,15 +6,15 @@ export function UpdateBanner() {
   if (!needRefresh) return null;
 
   return (
-    <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-primary/8 px-4 py-2.5">
-      <p className="text-[13px] font-medium text-foreground">A new version is ready</p>
+    <div className="glass page-enter flex items-center justify-between gap-3 rounded-full py-1.5 pr-1.5 pl-4 shadow-lg">
+      <p className="text-[13px] font-semibold">A new version is ready</p>
       <button
         type="button"
         onClick={update}
-        className="press flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-1.5 text-[12px] font-semibold text-primary-foreground"
+        className="press flex items-center gap-1.5 rounded-full bg-foreground px-3.5 py-2 text-[12px] font-bold text-background"
       >
-        <IconRefresh size={13} stroke={2.5} />
-        Update now
+        <IconRefresh size={13} stroke={2.25} />
+        Update
       </button>
     </div>
   );

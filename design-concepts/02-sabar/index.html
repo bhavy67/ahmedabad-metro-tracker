@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#F7F6F3" />
+<title>Sabar — Ahmedabad Metro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Noto+Sans+Gujarati:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/*
+  CONCEPT 02 — SABAR
+  Design language: Warm editorial minimalism. The app reads like a calm city journal.
+  Sentences instead of dashboards, serif display + Geist, bone paper, 1px hairlines.
+  Line colours are softened to pastel tints with a single true-colour dot for wayfinding.
+  Bilingual: Gujarati station names sit under every English name.
+*/
+:root {
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --surface-2: #FBFBFA;
+  --ink: #1F2124;
+  --ink-2: #5E5F5B;
+  --ink-3: #8E8D88;
+  --line: #E8E6E1;
+  --line-2: #DAD7D0;
+  --accent: #1F2124;
+
+  --blue: #0066CC;   --blue-tint: #E4F0FB;   --blue-ink: #1F5C93;
+  --red: #DC2626;    --red-tint: #FCEBEA;    --red-ink: #9F2F2D;
+  --yellow: #F2B705; --yellow-tint: #FBF3DB; --yellow-ink: #8A5D00;
+  --violet: #7C3AED; --violet-tint: #F0EBFB; --violet-ink: #5B3E9E;
+  --green-tint: #EDF3EC; --green-ink: #346538;
+
+  --serif: 'Instrument Serif', 'Times New Roman', serif;
+  --sans: 'Geist', 'Helvetica Neue', sans-serif;
+  --mono: 'Geist Mono', ui-monospace, monospace;
+  --gu: 'Noto Sans Gujarati', sans-serif;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161615; --surface: #1D1D1B; --surface-2: #222220;
+    --ink: #EDEBE6; --ink-2: #A9A7A1; --ink-3: #7A7873; --line: #2C2B29; --line-2: #3A3936; --accent: #EDEBE6;
+    --blue-tint: #1A2733; --blue-ink: #8DBDEB; --red-tint: #33201F; --red-ink: #EE9C98;
+    --yellow-tint: #332B17; --yellow-ink: #E8C46A; --violet-tint: #262036; --violet-ink: #BDA6F0;
+    --green-tint: #1E2A1F; --green-ink: #9AC79E;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161615; --surface: #1D1D1B; --surface-2: #222220;
+  --ink: #EDEBE6; --ink-2: #A9A7A1; --ink-3: #7A7873; --line: #2C2B29; --line-2: #3A3936; --accent: #EDEBE6;
+  --blue-tint: #1A2733; --blue-ink: #8DBDEB; --red-tint: #33201F; --red-ink: #EE9C98;
+  --yellow-tint: #332B17; --yellow-ink: #E8C46A; --violet-tint: #262036; --violet-ink: #BDA6F0;
+  --green-tint: #1E2A1F; --green-ink: #9AC79E;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-size: 15px; line-height: 1.6;
+  overflow-x: hidden;
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  transition: background .3s var(--ease), color .3s var(--ease);
+}
+/* Soft warm light spot behind the hero */
+body::before {
+  content: ""; position: fixed; top: -20vh; left: -10vw; width: 70vw; height: 70vh; pointer-events: none; z-index: -1;
+  background: radial-gradient(closest-side, rgba(214, 170, 110, .10), transparent);
+  animation: drift 28s ease-in-out infinite alternate;
+}
+@keyframes drift { to { transform: translate(18vw, 10vh); } }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.tnum { font-family: var(--mono); font-feature-settings: "tnum"; letter-spacing: -.01em; }
+.eyebrow { font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.gu { font-family: var(--gu); font-size: 12px; color: var(--ink-3); line-height: 1.3; }
+.serif { font-family: var(--serif); font-weight: 400; letter-spacing: -.02em; }
+.ic { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ---------- SHELL ---------- */
+.mobile-top { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 30px; height: 30px; }
+.brand .name { font-family: var(--serif); font-size: 26px; line-height: 1; letter-spacing: -.02em; }
+.brand .sub { display: block; font-size: 10.5px; color: var(--ink-3); letter-spacing: .04em; font-family: var(--sans); margin-top: 2px; }
+.icon-btn { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); transition: transform .15s var(--ease); }
+.icon-btn:active { transform: scale(.96); }
+
+.sidebar { display: none; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+/* ---------- HERO ---------- */
+.hero { padding: 28px 0 36px; }
+.hero h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(2.8rem, 11vw, 5.4rem); line-height: 1.02; letter-spacing: -.035em; }
+.hero h1 em { font-style: italic; color: var(--ink-2); }
+.lede { font-size: clamp(1.05rem, 4vw, 1.3rem); line-height: 1.55; color: var(--ink-2); max-width: 36ch; margin-top: 18px; }
+.lede strong { color: var(--ink); font-weight: 500; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; vertical-align: middle; }
+.chip .pip { width: 6px; height: 6px; border-radius: 50%; }
+.pulse { animation: pulse 2s var(--ease) infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.hero-meta { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); }
+.hero-meta div { font-size: 13px; color: var(--ink-2); }
+.hero-meta b { font-family: var(--mono); font-weight: 500; color: var(--ink); margin-right: 4px; }
+
+/* ---------- BENTO ---------- */
+.bento { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 22px; transition: box-shadow .25s var(--ease), border-color .25s var(--ease);
+}
+.card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.035); border-color: var(--line-2); }
+.card-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; gap: 12px; }
+.card-head h2 { font-family: var(--serif); font-weight: 400; font-size: 26px; letter-spacing: -.02em; line-height: 1.1; }
+.link { font-size: 13px; color: var(--ink-2); border-bottom: 1px solid var(--line-2); padding-bottom: 1px; white-space: nowrap; }
+.link:hover { color: var(--ink); border-color: var(--ink); }
+
+/* Commute */
+.commute-route { display: grid; grid-template-columns: 1fr; gap: 0; position: relative; }
+.c-stop { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; align-items: start; padding: 4px 0; }
+.c-stop .node { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--blue); background: var(--surface); margin: 8px 0 0 5px; position: relative; z-index: 1; }
+.c-stop .node.fill { background: var(--blue); }
+.c-stop .nm { font-family: var(--serif); font-size: 28px; line-height: 1.1; letter-spacing: -.02em; }
+.c-stop .t { font-family: var(--mono); font-size: 14px; color: var(--ink-2); padding-top: 8px; }
+.c-rail { position: absolute; left: 10px; top: 22px; bottom: 22px; width: 2px; background: var(--blue); opacity: .35; }
+.c-mid { padding: 6px 0 6px 34px; font-size: 13px; color: var(--ink-3); }
+.c-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+.big-count { font-family: var(--serif); font-size: 52px; line-height: .9; letter-spacing: -.03em; }
+.big-count small { font-family: var(--sans); font-size: 13px; color: var(--ink-3); letter-spacing: 0; margin-left: 6px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 6px; background: var(--accent); color: var(--bg); font-size: 14px; font-weight: 500; transition: transform .15s var(--ease), opacity .15s; }
+.btn:hover { opacity: .88; }
+.btn:active { transform: scale(.98); }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-2); }
+.spacer { flex: 1; }
+
+/* Departures */
+.dep { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.dep:first-of-type { border-top: 0; padding-top: 0; }
+.dep .ln { width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; font-size: 12px; font-weight: 600; }
+.dep .to { font-weight: 500; line-height: 1.25; }
+.dep .mins { text-align: right; font-family: var(--mono); font-size: 22px; line-height: 1; }
+.dep .mins small { display: block; font-family: var(--sans); font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+.dep .mins.now { color: var(--green-ink); }
+.crowd { display: inline-flex; gap: 2px; margin-left: 6px; vertical-align: 1px; }
+.crowd i { width: 5px; height: 5px; border-radius: 50%; background: var(--line-2); }
+.crowd i.on { background: var(--ink-2); }
+
+/* Live line — vertical timeline */
+.timeline { position: relative; padding-left: 4px; }
+.tl-row { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; min-height: 46px; position: relative; }
+.tl-row::before { content: ""; position: absolute; left: 12px; top: 0; bottom: 0; width: 2px; background: var(--blue-tint); }
+.tl-row:first-child::before { top: 50%; }
+.tl-row:last-child::before { bottom: 50%; }
+.tl-row .n { width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--blue); margin-left: 8px; position: relative; z-index: 1; }
+.tl-row.ix .n { width: 14px; height: 14px; margin-left: 6px; border-width: 3px; }
+.tl-row .sn { font-size: 14px; font-weight: 500; line-height: 1.2; }
+.timeline .train {
+  position: absolute; left: 5px; z-index: 2; width: 16px; height: 16px; border-radius: 50%; background: var(--blue);
+  box-shadow: 0 0 0 4px var(--blue-tint); transition: top 1s linear;
+}
+.tl-row .eta { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+
+/* Lines */
+.line-item { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+.line-item:first-of-type { border-top: 0; padding-top: 2px; }
+.line-badge { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; position: relative; font-family: var(--serif); font-size: 22px; }
+.line-badge::after { content: ""; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--c); }
+.line-item .nm { font-weight: 500; }
+.line-item .tr { font-size: 13px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.line-item .hr { font-family: var(--mono); font-size: 12px; color: var(--ink-2); text-align: right; }
+
+/* Planner — written as a sentence */
+.sentence { font-family: var(--serif); font-size: clamp(1.7rem, 6.5vw, 2.4rem); line-height: 1.45; letter-spacing: -.02em; color: var(--ink-3); }
+.slot {
+  color: var(--ink); border-bottom: 1.5px dashed var(--ink-3); padding: 0 2px; cursor: text; white-space: nowrap;
+  transition: border-color .2s var(--ease);
+}
+.slot:hover, .slot:focus { border-bottom-style: solid; border-color: var(--ink); outline: none; }
+.toggle { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 3px; margin-top: 18px; }
+.toggle button { padding: 6px 12px; border-radius: 6px; font-size: 13px; color: var(--ink-2); transition: background .2s var(--ease), color .2s; }
+.toggle button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.result { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-top: 18px; }
+.result div { background: var(--surface-2); padding: 12px 14px; }
+.result b { display: block; font-family: var(--mono); font-weight: 500; font-size: 18px; margin-top: 2px; }
+.legs { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 14px; font-size: 13px; color: var(--ink-2); }
+.legs .chip { text-transform: none; letter-spacing: 0; font-size: 12px; }
+
+/* Places */
+.places { display: grid; grid-template-columns: 1fr; }
+.place { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+.place:first-child { border-top: 0; padding-top: 0; }
+.place .pi { width: 38px; height: 38px; border-radius: 8px; display: grid; place-items: center; }
+.place .pn { font-weight: 500; line-height: 1.25; }
+.place .ps { font-size: 13px; color: var(--ink-3); }
+.place .pd { font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+
+/* Footer */
+footer { padding: 56px 0 40px; color: var(--ink-3); font-size: 13px; }
+footer .serif { font-size: 32px; color: var(--ink); line-height: 1.1; margin-bottom: 8px; }
+kbd { font-family: var(--mono); font-size: 11px; padding: 1px 6px; border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; background: var(--surface); color: var(--ink-2); }
+
+/* ---------- MOBILE TAB BAR ---------- */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+}
+.tabbar a { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0; font-size: 11px; color: var(--ink-3); position: relative; }
+.tabbar a[aria-current="page"] { color: var(--ink); font-weight: 500; }
+.tabbar a[aria-current="page"]::after { content: ""; position: absolute; bottom: -2px; width: 4px; height: 4px; border-radius: 50%; background: var(--ink); }
+.tabbar svg { width: 22px; height: 22px; }
+
+/* ---------- REVEAL ---------- */
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s var(--ease), transform .6s var(--ease); transition-delay: calc(var(--i, 0) * 80ms); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ---------- TABLET / DESKTOP ---------- */
+@media (min-width: 720px) {
+  .bento { grid-template-columns: repeat(6, 1fr); }
+  .span-6 { grid-column: span 6; } .span-4 { grid-column: span 4; } .span-3 { grid-column: span 3; } .span-2 { grid-column: span 2; }
+  .places { grid-template-columns: 1fr 1fr; column-gap: 32px; }
+  .place:nth-child(2) { border-top: 0; padding-top: 0; }
+  .card { padding: 28px; }
+}
+@media (min-width: 1080px) {
+  body { padding-bottom: 0; display: grid; grid-template-columns: 248px 1fr; }
+  .tabbar, .mobile-top { display: none; }
+  .sidebar {
+    display: flex; flex-direction: column; gap: 28px; position: sticky; top: 0; height: 100dvh;
+    padding: 28px 22px; border-right: 1px solid var(--line);
+  }
+  .sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin: 0 -10px; border-radius: 6px; font-size: 14px; color: var(--ink-2); transition: background .15s, color .15s; }
+  .sidebar nav a:hover { background: var(--surface); color: var(--ink); }
+  .sidebar nav a[aria-current="page"] { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: inset 0 0 0 1px var(--line); }
+  .sidebar nav a kbd { margin-left: auto; }
+  .side-lines a { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 14px; color: var(--ink-2); }
+  .side-lines a:hover { color: var(--ink); }
+  .side-lines i { width: 8px; height: 8px; border-radius: 50%; }
+  .side-lines .cnt { margin-left: auto; font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+  .side-foot { margin-top: auto; font-size: 12px; color: var(--ink-3); display: flex; justify-content: space-between; align-items: center; }
+  .wrap { padding: 0 48px; }
+  .hero { padding: 72px 0 56px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Logo: a ring (the city) crossed by a river line (the Sabarmati) that doubles as a track. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="14.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M3 17.5c4.2 0 4.2-3 8.4-3s4.2 3 8.4 3 4.2-3 8.4-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="11.4" cy="14.5" r="2" fill="currentColor"/>
+  </symbol>
+</svg>
+
+<aside class="sidebar">
+  <a class="brand" href="#"><svg><use href="#logo"/></svg><span><span class="name">Sabar</span><span class="sub">Ahmedabad Metro</span></span></a>
+  <nav aria-label="Primary">
+    <a href="#" aria-current="page"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20H4z"/></svg>Today<kbd>T</kbd></a>
+    <a href="#live"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>Live map<kbd>M</kbd></a>
+    <a href="#plan"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h6a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8"/></svg>Plan a trip<kbd>P</kbd></a>
+    <a href="#places"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Places<kbd>G</kbd></a>
+  </nav>
+  <div>
+    <div class="eyebrow" style="margin-bottom:6px">Lines</div>
+    <div class="side-lines">
+      <a href="#"><i style="background:var(--blue)"></i>Blue<span class="cnt">12</span></a>
+      <a href="#"><i style="background:var(--red)"></i>Red<span class="cnt">10</span></a>
+      <a href="#"><i style="background:var(--yellow)"></i>Yellow<span class="cnt">4</span></a>
+      <a href="#"><i style="background:var(--violet)"></i>Violet<span class="cnt">1</span></a>
+    </div>
+  </div>
+  <div class="side-foot"><span>Works offline</span><button class="icon-btn themeBtn" aria-label="Toggle theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button></div>
+</aside>
+
+<div>
+  <header class="mobile-top">
+    <a class="brand" href="#"><svg><use href="#logo"/></svg><span><span class="name">Sabar</span><span class="sub">Ahmedabad Metro</span></span></a>
+    <button class="icon-btn themeBtn" aria-label="Toggle theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></button>
+  </header>
+
+  <main class="wrap">
+    <section class="hero reveal">
+      <p class="eyebrow" id="date">Thursday, 9 October</p>
+      <h1 style="margin-top:10px"><span id="greet">Good evening</span>.<br/><em>The metro is running.</em></h1>
+      <p class="lede">
+        <strong id="count">27 trains</strong> are moving across Ahmedabad right now. Your next train home leaves
+        <strong>Kalupur</strong> in <strong class="tnum" id="ledeMin">6 min</strong>.
+      </p>
+      <div class="hero-meta">
+        <div><b class="tnum" id="clock">18:42</b>IST</div>
+        <div><span class="chip" style="background:var(--green-tint);color:var(--green-ink)"><span class="pip pulse" style="background:currentColor"></span>Good service</span></div>
+        <div><b class="tnum">23:45</b>last train</div>
+      </div>
+    </section>
+
+    <div class="bento">
+      <!-- Commute -->
+      <article class="card span-4 reveal" style="--i:0">
+        <div class="card-head"><h2>Your commute</h2><button class="link" id="flip">Reverse direction</button></div>
+        <div class="commute-route">
+          <span class="c-rail" aria-hidden="true"></span>
+          <div class="c-stop"><span class="node fill"></span><span><span class="nm" id="cA">Kalupur</span><div class="gu" id="cAg">કાલુપુર</div></span><span class="t" id="cAt">18:48</span></div>
+          <div class="c-mid">Blue Line · 10 stations · no changes</div>
+          <div class="c-stop"><span class="node"></span><span><span class="nm" id="cB">Thaltej</span><div class="gu" id="cBg">થલતેજ</div></span><span class="t" id="cBt">19:10</span></div>
+        </div>
+        <div class="c-foot">
+          <span class="big-count tnum" id="cMin">6<small>min to departure</small></span>
+          <span class="spacer"></span>
+          <span class="chip" style="background:var(--bg);color:var(--ink-2);border:1px solid var(--line)">₹15 · ₹13.5 NCMC</span>
+          <a class="btn" href="#">Start trip <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </article>
+
+      <!-- Departures -->
+      <article class="card span-2 reveal" style="--i:1">
+        <div class="card-head"><div><h2>Gurukul Road</h2><div class="gu">ગુરુકુલ રોડ · 400 m away</div></div></div>
+        <div id="deps"></div>
+      </article>
+
+      <!-- Live line -->
+      <article class="card span-3 reveal" id="live" style="--i:0">
+        <div class="card-head"><div><h2>Blue Line, live</h2><div class="gu" style="font-family:var(--sans)">Towards Vastral Gam</div></div><a class="link" href="#">Full map</a></div>
+        <div class="timeline" id="timeline"></div>
+      </article>
+
+      <!-- Lines -->
+      <article class="card span-3 reveal" style="--i:1">
+        <div class="card-head"><h2>Four lines</h2><span class="eyebrow">54 stations</span></div>
+        <a class="line-item" href="#"><span class="line-badge" style="background:var(--blue-tint);color:var(--blue-ink);--c:var(--blue)">B</span><span style="min-width:0"><div class="nm">Blue Line</div><div class="tr">Thaltej Gam to Vastral Gam</div></span><span class="hr">06:20<br/>23:45</span></a>
+        <a class="line-item" href="#"><span class="line-badge" style="background:var(--red-tint);color:var(--red-ink);--c:var(--red)">R</span><span style="min-width:0"><div class="nm">Red Line</div><div class="tr">APMC to Koteshwar Road</div></span><span class="hr">06:16<br/>23:35</span></a>
+        <a class="line-item" href="#"><span class="line-badge" style="background:var(--yellow-tint);color:var(--yellow-ink);--c:var(--yellow)">Y</span><span style="min-width:0"><div class="nm">Yellow Line</div><div class="tr">Koteshwar Road to Mahatma Mandir</div></span><span class="hr">06:20<br/>22:22</span></a>
+        <a class="line-item" href="#"><span class="line-badge" style="background:var(--violet-tint);color:var(--violet-ink);--c:var(--violet)">V</span><span style="min-width:0"><div class="nm">Violet Line</div><div class="tr">GNLU to GIFT City</div></span><span class="hr">06:45<br/>20:10</span></a>
+      </article>
+
+      <!-- Planner -->
+      <article class="card span-6 reveal" id="plan">
+        <div class="card-head"><h2>Plan a trip</h2><a class="link" href="#">Recent trips</a></div>
+        <p class="sentence">
+          From <span class="slot" contenteditable="true" spellcheck="false">Vadaj</span>
+          to <span class="slot" contenteditable="true" spellcheck="false">GIFT City</span>,
+          <span id="whenWord">leaving</span> <span class="slot" contenteditable="true" spellcheck="false">now</span>.
+        </p>
+        <div class="toggle" role="group" aria-label="Timing">
+          <button aria-pressed="true" data-w="leaving">Depart at</button>
+          <button aria-pressed="false" data-w="arriving by">Arrive by</button>
+        </div>
+        <div class="result">
+          <div><span class="eyebrow">Journey</span><b>58 min</b></div>
+          <div><span class="eyebrow">Changes</span><b>2</b></div>
+          <div><span class="eyebrow">Fare</span><b>₹25</b></div>
+        </div>
+        <div class="legs">
+          <span class="chip" style="background:var(--red-tint);color:var(--red-ink)"><span class="pip" style="background:var(--red)"></span>Red · 4 stops</span>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 6l6 6-6 6"/></svg>
+          <span class="chip" style="background:var(--yellow-tint);color:var(--yellow-ink)"><span class="pip" style="background:var(--yellow)"></span>Yellow · 7 stops</span>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 6l6 6-6 6"/></svg>
+          <span class="chip" style="background:var(--violet-tint);color:var(--violet-ink)"><span class="pip" style="background:var(--violet)"></span>Violet · 2 stops</span>
+        </div>
+      </article>
+
+      <!-- Places -->
+      <article class="card span-6 reveal" id="places">
+        <div class="card-head"><h2>Where the metro takes you</h2><a class="link" href="#">All 26 places</a></div>
+        <div class="places">
+          <a class="place" href="#"><span class="pi" style="background:var(--green-tint);color:var(--green-ink)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 18c3 0 3-2 6-2s3 2 6 2 3-2 6-2M3 13c3 0 3-2 6-2s3 2 6 2 3-2 6-2"/></svg></span><span><div class="pn">Kankaria Lake</div><div class="ps">Kankaria East · Blue</div></span><span class="pd">650 m</span></a>
+          <a class="place" href="#"><span class="pi" style="background:var(--yellow-tint);color:var(--yellow-ink)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 20V9l8-5 8 5v11M9 20v-6h6v6"/></svg></span><span><div class="pn">Sabarmati Ashram</div><div class="ps">Usmanpura · Red</div></span><span class="pd">1.4 km</span></a>
+          <a class="place" href="#"><span class="pi" style="background:var(--blue-tint);color:var(--blue-ink)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 9l9-5 9 5-9 5zM7 11v5c3 2 7 2 10 0v-5"/></svg></span><span><div class="pn">Gujarat University</div><div class="ps">Gujarat University · Blue</div></span><span class="pd">300 m</span></a>
+          <a class="place" href="#"><span class="pi" style="background:var(--red-tint);color:var(--red-ink)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 5v14M5 12h14"/></svg></span><span><div class="pn">Civil Hospital</div><div class="ps">Shahpur · Blue</div></span><span class="pd">2.1 km</span></a>
+          <a class="place" href="#"><span class="pi" style="background:var(--violet-tint);color:var(--violet-ink)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="4" y="5" width="16" height="12" rx="2"/><path d="M8 21l2-4M16 21l-2-4"/></svg></span><span><div class="pn">Ahmedabad Railway Station</div><div class="ps">Kalupur · Blue</div></span><span class="pd">200 m</span></a>
+          <a class="place" href="#"><span class="pi" style="background:var(--yellow-tint);color:var(--yellow-ink)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg></span><span><div class="pn">Ahmedabad One Mall</div><div class="ps">Gurukul Road · Blue</div></span><span class="pd">900 m</span></a>
+        </div>
+      </article>
+    </div>
+
+    <footer>
+      <p class="serif">Calm, accurate, offline.</p>
+      <p>Train positions are computed from the official GMRC timetable. Unofficial companion app. Press <kbd>/</kbd> to search stations.</p>
+    </footer>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Primary">
+  <a href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20H4z"/></svg>Today</a>
+  <a href="#live"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>Live</a>
+  <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M5 5v14M12 5v14M19 5v14"/></svg>Lines</a>
+  <a href="#plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h6a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8"/></svg>Plan</a>
+  <a href="#places"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Places</a>
+</nav>
+
+<script>
+// Mock data — the real app derives all of this from the GMRC timetable.
+const STOPS = [
+  ['Commerce Six Road', 0], ['S P Stadium', 0], ['Old High Court', 1], ['Shahpur', 0],
+  ['Gheekanta', 0], ['Kalupur', 0], ['Kankaria East', 0],
+];
+const ist = () => new Date(Date.now() + (330 + new Date().getTimezoneOffset()) * 60000);
+const pad = n => String(n).padStart(2, '0');
+const headway = h => (h >= 8 && h < 11) || (h >= 17 && h < 20) ? 8 : 12;
+const nextIn = (mins, h, off) => { const f = h - ((mins + off) % h); return f === h ? 0 : f; };
+const hm = total => `${pad(Math.floor(total / 60) % 24)}:${pad(total % 60)}`;
+let home = true;
+
+const tl = document.getElementById('timeline');
+tl.innerHTML = STOPS.map(([n, ix], i) => `<div class="tl-row ${ix ? 'ix' : ''}"><span class="n"></span><span class="sn">${n}</span><span class="eta"></span></div>`).join('');
+const marker = document.createElement('span'); marker.className = 'train'; marker.setAttribute('aria-label', 'Train');
+tl.style.position = 'relative'; tl.appendChild(marker);
+
+function tick() {
+  const d = ist(), h = d.getHours(), mins = h * 60 + d.getMinutes(), hw = headway(h);
+  const running = mins >= 376 && mins <= 1425;
+  document.getElementById('clock').textContent = `${pad(h)}:${pad(d.getMinutes())}`;
+  document.getElementById('date').textContent = d.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' });
+  document.getElementById('greet').textContent = h < 4 ? 'Late night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 21 ? 'Good evening' : 'Good night';
+  document.getElementById('count').textContent = running ? `${hw === 8 ? 34 : 27} trains` : 'No trains';
+
+  const c = nextIn(mins, hw, home ? 2 : 6);
+  document.getElementById('cMin').innerHTML = `${c}<small>min to departure</small>`;
+  document.getElementById('ledeMin').textContent = `${c} min`;
+  document.getElementById('cAt').textContent = hm(mins + c);
+  document.getElementById('cBt').textContent = hm(mins + c + 22);
+
+  const deps = [
+    { to: 'Vastral Gam', off: 3 }, { to: 'Thaltej Gam', off: 7 },
+  ].flatMap(x => [0, 1].map(k => ({ ...x, t: nextIn(mins, hw, x.off) + k * hw }))).sort((a, b) => a.t - b.t).slice(0, 4);
+  document.getElementById('deps').innerHTML = deps.map((x, i) => {
+    const load = (x.t + i) % 3 + 1;
+    return `<div class="dep"><span class="ln" style="background:var(--blue-tint);color:var(--blue-ink)">B</span>
+      <span><div class="to">${x.to}</div><div class="gu" style="font-family:var(--sans)">${['Quiet', 'Moderate', 'Busy'][load - 1]}<span class="crowd">${[1,2,3].map(k => `<i class="${k <= load ? 'on' : ''}"></i>`).join('')}</span></div></span>
+      <span class="mins ${x.t === 0 ? 'now' : ''}">${x.t === 0 ? 'Now' : x.t}<small>${x.t === 0 ? 'boarding' : 'min'}</small></span></div>`;
+  }).join('');
+
+  // Train marker moves down the timeline; each hop ≈ 2 minutes.
+  const rows = tl.querySelectorAll('.tl-row'), seg = 120, secs = (mins * 60 + d.getSeconds()) % (seg * (rows.length - 1));
+  const idx = Math.floor(secs / seg), frac = (secs % seg) / seg;
+  const a = rows[idx], b = rows[idx + 1] || a;
+  marker.style.top = (a.offsetTop + (b.offsetTop - a.offsetTop) * frac + a.offsetHeight / 2 - 8) + 'px';
+  rows.forEach((r, i) => { r.querySelector('.eta').textContent = i <= idx ? '' : `${Math.max(1, Math.round((i - idx - frac) * 2))} min`; });
+}
+
+document.getElementById('flip').addEventListener('click', () => {
+  home = !home;
+  const [a, ag, b, bg] = home ? ['Kalupur', 'કાલુપુર', 'Thaltej', 'થલતેજ'] : ['Thaltej', 'થલતેજ', 'Kalupur', 'કાલુપુર'];
+  Object.entries({ cA: a, cAg: ag, cB: b, cBg: bg }).forEach(([id, v]) => document.getElementById(id).textContent = v);
+  tick();
+});
+document.querySelectorAll('.toggle button').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.toggle button').forEach(x => x.setAttribute('aria-pressed', x === btn));
+  document.getElementById('whenWord').textContent = btn.dataset.w;
+}));
+document.querySelectorAll('.themeBtn').forEach(b => b.addEventListener('click', () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+}));
+
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .1 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>

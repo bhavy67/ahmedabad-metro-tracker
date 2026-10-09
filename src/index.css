@@ -1,204 +1,98 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-/* Trial pairing — Inter (body) + Bricolage Grotesque (display) + JetBrains Mono (numbers).
-   Old fonts stay installed; comment these three back in and swap the --font-* vars
-   below to revert instantly:
-     @import "@fontsource-variable/public-sans";
-     @import "@fontsource-variable/space-grotesk";
-     @import "@fontsource/ibm-plex-mono/400.css";
-*/
-@import "@fontsource-variable/inter";
-@import "@fontsource-variable/bricolage-grotesque";
-@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/unbounded";
+@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/geist-mono";
 
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Design system — "Calm modern transit".
-  A quiet, glanceable civic app. The four official metro line colors
-  (Blue/Red/Yellow/Violet) are the ONLY strong accents — surfaces stay
-  restrained so the color that matters (which line, which train) reads
-  first. Public Sans for body, Space Grotesk for display, IBM Plex Mono
-  for every live number. Base size 15px so nothing on screen has to
-  work below 12px.
+  Design system — "Pulse".
+  The city at night: OLED black surfaces, and the four official line colours
+  (Blue/Red/Yellow/Violet) used as light sources — glowing tracks, ambient
+  orbs, live trains as moving points of light. Dark-only by design.
+  Unbounded for display, Manrope for UI, Geist Mono for every live number.
+  Cards are "double-bezel" glass: a hairline shell around an inner core.
 */
 
 :root {
-    --background: oklch(0.9850 0.0035 264.5);
-    --foreground: oklch(0.1700 0.0200 264.5);
-    --card: oklch(1.0000 0 0);
-    --card-foreground: oklch(0.1700 0.0200 264.5);
-    --card-muted: oklch(0.9700 0.0050 264.5);
-    --popover: oklch(1.0000 0 0);
-    --popover-foreground: oklch(0.1700 0.0200 264.5);
-    --primary: oklch(0.5550 0.2050 260.5);
-    --primary-foreground: oklch(1.0000 0 0);
-    --secondary: oklch(0.9500 0.0080 264.5);
-    --secondary-foreground: oklch(0.1700 0.0200 264.5);
-    --muted: oklch(0.9500 0.0080 264.5);
-    --muted-foreground: oklch(0.4400 0.0180 264.5);
-    --accent: oklch(0.9350 0.0080 264.5);
-    --accent-foreground: oklch(0.1700 0.0200 264.5);
-    --destructive: oklch(0.6100 0.2150 25.0);
-    --destructive-foreground: oklch(1.0000 0 0);
-    --border: oklch(0.9050 0.0090 264.5);
-    --border-strong: oklch(0.8500 0.0100 264.5);
-    --input: oklch(0.9050 0.0090 264.5);
-    --ring: oklch(0.5550 0.2050 260.5);
+    color-scheme: dark;
 
-    /* Line colors — fixed wayfinding hues, identical in both themes. */
-    --line-blue: oklch(0.5850 0.2000 260.0);
-    --line-blue-ink: oklch(0.9900 0 0);
-    --line-red: oklch(0.6300 0.2150 22.0);
-    --line-red-ink: oklch(0.9900 0 0);
-    --line-yellow: oklch(0.8300 0.1600 87.0);
-    --line-yellow-ink: oklch(0.1800 0.0300 87.0);
-    --line-violet: oklch(0.6300 0.2100 305.0);
-    --line-violet-ink: oklch(0.9900 0 0);
+    --background: #050507;
+    --foreground: #F4F4F6;
+    --card: #0E0E14;
+    --card-foreground: #F4F4F6;
+    --card-muted: rgb(255 255 255 / 0.04);
+    --popover: #0F0F16;
+    --popover-foreground: #F4F4F6;
+    --primary: #3D8BFF;
+    --primary-foreground: #050507;
+    --secondary: rgb(255 255 255 / 0.06);
+    --secondary-foreground: #F4F4F6;
+    --muted: rgb(255 255 255 / 0.05);
+    --muted-foreground: rgb(244 244 246 / 0.56);
+    --accent: rgb(255 255 255 / 0.07);
+    --accent-foreground: #F4F4F6;
+    --destructive: #FF5A6A;
+    --destructive-foreground: #050507;
+    --border: rgb(255 255 255 / 0.08);
+    --border-strong: rgb(255 255 255 / 0.14);
+    --input: rgb(255 255 255 / 0.10);
+    --ring: #3D8BFF;
+
+    /* Live / "good" signal — used sparingly: live dots, imminent departures. */
+    --live: #5CF2B5;
+
+    /* Line colours — tuned to glow on black. Ink is dark for all four. */
+    --line-blue: #3D8BFF;
+    --line-blue-ink: #050507;
+    --line-red: #FF4D5E;
+    --line-red-ink: #050507;
+    --line-yellow: #FFC83D;
+    --line-yellow-ink: #050507;
+    --line-violet: #A270FF;
+    --line-violet-ink: #050507;
 
     --chart-1: var(--line-blue);
     --chart-2: var(--line-red);
     --chart-3: var(--line-yellow);
     --chart-4: var(--line-violet);
-    --chart-5: oklch(0.5590 0 0);
+    --chart-5: rgb(244 244 246 / 0.5);
 
-    /* Softer radii — modern iOS/Material-3 feel; nothing pointy anywhere. */
     --radius: 1rem;
-    --sidebar: oklch(0.9700 0.0037 264.5);
-    --sidebar-foreground: oklch(0.1600 0.0200 264.5);
+    --sidebar: #08080C;
+    --sidebar-foreground: #F4F4F6;
     --sidebar-primary: var(--primary);
-    --sidebar-primary-foreground: oklch(1.0000 0 0);
-    --sidebar-accent: oklch(0.9350 0.0080 264.5);
-    --sidebar-accent-foreground: oklch(0.1600 0.0200 264.5);
-    --sidebar-border: oklch(0.8850 0.0090 264.5);
+    --sidebar-primary-foreground: #050507;
+    --sidebar-accent: rgb(255 255 255 / 0.07);
+    --sidebar-accent-foreground: #F4F4F6;
+    --sidebar-border: rgb(255 255 255 / 0.08);
     --sidebar-ring: var(--primary);
 
-    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Bricolage Grotesque Variable', 'Inter Variable', ui-sans-serif, sans-serif;
-    --font-mono: 'JetBrains Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    --font-sans: 'Manrope Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Unbounded Variable', 'Manrope Variable', ui-sans-serif, sans-serif;
+    --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+    --spring: cubic-bezier(0.32, 0.72, 0, 1);
 
     --shadow-color: #000000;
-    --shadow-opacity: 0.06;
-    --shadow-blur: 12px;
-    --shadow-spread: -2px;
-    --shadow-offset-x: 0;
-    --shadow-offset-y: 4px;
-    --letter-spacing: 0em;
-    --spacing: 0.25rem;
-    --shadow-2xs: 0 1px 2px 0px hsl(0 0% 0% / 0.04);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.06), 0 1px 2px -1px hsl(0 0% 0% / 0.06);
-    --shadow: 0 4px 12px -3px hsl(0 0% 0% / 0.08), 0 1px 2px -1px hsl(0 0% 0% / 0.06);
-    --shadow-md: 0 8px 24px -6px hsl(0 0% 0% / 0.10);
-    --shadow-lg: 0 12px 32px -8px hsl(0 0% 0% / 0.12);
-    --shadow-xl: 0 20px 44px -10px hsl(0 0% 0% / 0.14);
-    --shadow-2xl: 0 28px 60px -12px hsl(0 0% 0% / 0.20);
-    --tracking-normal: 0em;
-}
-
-.dark {
-    --background: oklch(0.1350 0.0140 258.0);
-    --foreground: oklch(0.9500 0.0080 258.0);
-    --card: oklch(0.1850 0.0180 258.0);
-    --card-foreground: oklch(0.9500 0.0080 258.0);
-    --card-muted: oklch(0.2200 0.0200 258.0);
-    --popover: oklch(0.2050 0.0210 258.0);
-    --popover-foreground: oklch(0.9500 0.0080 258.0);
-    --primary: oklch(0.7100 0.1850 260.5);
-    --primary-foreground: oklch(0.1200 0.0200 260.5);
-    --secondary: oklch(0.2450 0.0210 258.0);
-    --secondary-foreground: oklch(0.9500 0.0080 258.0);
-    --muted: oklch(0.2450 0.0210 258.0);
-    --muted-foreground: oklch(0.6800 0.0180 258.0);
-    --accent: oklch(0.2800 0.0250 258.0);
-    --accent-foreground: oklch(0.9500 0.0080 258.0);
-    --destructive: oklch(0.6800 0.2050 22.0);
-    --destructive-foreground: oklch(0.1200 0.0300 22.0);
-    --border: oklch(0.2650 0.0200 258.0);
-    --border-strong: oklch(0.3400 0.0220 258.0);
-    --input: oklch(0.2650 0.0200 258.0);
-    --ring: oklch(0.7100 0.1850 260.5);
-
-    --line-blue: oklch(0.7000 0.1750 258.0);
-    --line-blue-ink: oklch(0.1200 0.0200 258.0);
-    --line-red: oklch(0.7000 0.2000 22.0);
-    --line-red-ink: oklch(0.1400 0.0300 22.0);
-    --line-yellow: oklch(0.8500 0.1550 87.0);
-    --line-yellow-ink: oklch(0.1800 0.0300 87.0);
-    --line-violet: oklch(0.7100 0.1900 305.0);
-    --line-violet-ink: oklch(0.1400 0.0300 305.0);
-
-    --chart-1: var(--line-blue);
-    --chart-2: var(--line-red);
-    --chart-3: var(--line-yellow);
-    --chart-4: var(--line-violet);
-    --chart-5: oklch(0.7058 0 0);
-
-    --sidebar: oklch(0.1350 0.0170 258.0);
-    --sidebar-foreground: oklch(0.9500 0.0080 258.0);
-    --sidebar-primary: var(--primary);
-    --sidebar-primary-foreground: oklch(0.1200 0.0200 260.5);
-    --sidebar-accent: oklch(0.2450 0.0210 258.0);
-    --sidebar-accent-foreground: oklch(0.9500 0.0080 258.0);
-    --sidebar-border: oklch(0.2850 0.0220 258.0);
-    --sidebar-ring: var(--primary);
-
-    --shadow-color: #000000;
-    --shadow-opacity: 0.40;
+    --shadow-opacity: 0.5;
     --shadow-blur: 24px;
     --shadow-spread: -6px;
     --shadow-offset-x: 0;
     --shadow-offset-y: 10px;
-    --shadow-2xs: 0 1px 2px 0px hsl(0 0% 0% / 0.30);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.36);
-    --shadow-sm: 0 2px 6px 0px hsl(0 0% 0% / 0.40);
-    --shadow: 0 6px 18px -4px hsl(0 0% 0% / 0.48);
-    --shadow-md: 0 10px 28px -8px hsl(0 0% 0% / 0.52);
-    --shadow-lg: 0 16px 40px -10px hsl(0 0% 0% / 0.56);
-    --shadow-xl: 0 24px 52px -12px hsl(0 0% 0% / 0.60);
-    --shadow-2xl: 0 32px 72px -14px hsl(0 0% 0% / 0.68);
-}
-
-/* System preference drives the default; an explicit .dark class (manual
-   toggle) always wins, matching-or-overriding the media query below. */
-@media (prefers-color-scheme: dark) {
-    :root:not(.light) {
-        --background: oklch(0.1350 0.0140 258.0);
-        --foreground: oklch(0.9500 0.0080 258.0);
-        --card: oklch(0.1850 0.0180 258.0);
-        --card-foreground: oklch(0.9500 0.0080 258.0);
-        --card-muted: oklch(0.2200 0.0200 258.0);
-        --popover: oklch(0.2050 0.0210 258.0);
-        --popover-foreground: oklch(0.9500 0.0080 258.0);
-        --primary: oklch(0.7100 0.1850 260.5);
-        --primary-foreground: oklch(0.1200 0.0200 260.5);
-        --secondary: oklch(0.2450 0.0210 258.0);
-        --secondary-foreground: oklch(0.9500 0.0080 258.0);
-        --muted: oklch(0.2450 0.0210 258.0);
-        --muted-foreground: oklch(0.6800 0.0180 258.0);
-        --accent: oklch(0.2800 0.0250 258.0);
-        --accent-foreground: oklch(0.9500 0.0080 258.0);
-        --destructive: oklch(0.6800 0.2050 22.0);
-        --destructive-foreground: oklch(0.1200 0.0300 22.0);
-        --border: oklch(0.2650 0.0200 258.0);
-        --border-strong: oklch(0.3400 0.0220 258.0);
-        --input: oklch(0.2650 0.0200 258.0);
-        --ring: oklch(0.7100 0.1850 260.5);
-        --line-blue: oklch(0.7000 0.1750 258.0);
-        --line-blue-ink: oklch(0.1200 0.0200 258.0);
-        --line-red: oklch(0.7000 0.2000 22.0);
-        --line-red-ink: oklch(0.1400 0.0300 22.0);
-        --line-yellow: oklch(0.8500 0.1550 87.0);
-        --line-yellow-ink: oklch(0.1800 0.0300 87.0);
-        --line-violet: oklch(0.7100 0.1900 305.0);
-        --line-violet-ink: oklch(0.1400 0.0300 305.0);
-        --sidebar: oklch(0.1350 0.0170 258.0);
-        --sidebar-foreground: oklch(0.9500 0.0080 258.0);
-        --sidebar-accent: oklch(0.2450 0.0210 258.0);
-        --sidebar-accent-foreground: oklch(0.9500 0.0080 258.0);
-        --sidebar-border: oklch(0.2850 0.0220 258.0);
-    }
+    --letter-spacing: 0em;
+    --spacing: 0.25rem;
+    --shadow-2xs: 0 1px 2px 0px rgb(0 0 0 / 0.4);
+    --shadow-xs: 0 1px 3px 0px rgb(0 0 0 / 0.45);
+    --shadow-sm: 0 2px 6px 0px rgb(0 0 0 / 0.5);
+    --shadow: 0 6px 18px -4px rgb(0 0 0 / 0.55);
+    --shadow-md: 0 10px 28px -8px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0 20px 50px -20px rgb(0 0 0 / 0.8);
+    --shadow-xl: 0 24px 60px -16px rgb(0 0 0 / 0.8);
+    --shadow-2xl: 0 32px 72px -14px rgb(0 0 0 / 0.85);
+    --tracking-normal: 0em;
 }
 
 @theme inline {
@@ -281,10 +175,15 @@
     --color-shadow-color: var(--shadow-color);
 }
 
+
+@theme inline {
+    --color-live: var(--live);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   html {
     @apply font-sans;
     /* 15px root — every text-* utility scales from here, so nothing on screen
@@ -294,38 +193,151 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    }
+  }
   body {
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: none;
-    font-feature-settings: 'ss01', 'cv02';
-    }
+  }
   button:not(:disabled), [role="button"]:not(:disabled), a {
     cursor: pointer;
-    }
-  /* Tabular figures everywhere numbers live — the departure-board discipline. */
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 45%, transparent);
+  }
+  /* Native time inputs etc. render their dark chrome. */
+  input { color-scheme: dark; }
   .tnum {
     font-variant-numeric: tabular-nums;
-    }
-  /* Interactive press feedback — subtle, universal. */
+  }
   .press {
-    transition: transform 120ms cubic-bezier(0.4, 0, 0.2, 1), background-color 120ms;
-    }
+    transition: transform 300ms var(--spring), background-color 300ms var(--spring), border-color 300ms var(--spring), color 300ms var(--spring);
+  }
   .press:active {
     transform: scale(0.97);
-    }
-  /* Horizontal-scroll strips (line cards, favourite chips) hide the scrollbar
-     for a clean edge-to-edge look; scrolling still works on trackpad/touch. */
+  }
   .scrollbar-hidden {
     scrollbar-width: none;
     -ms-overflow-style: none;
-    }
+  }
   .scrollbar-hidden::-webkit-scrollbar {
     display: none;
-    }
+  }
+  /* Thin dark scrollbars on desktop. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(255 255 255 / 0.14) transparent;
+  }
 }
+
+@layer components {
+  /* ---- Ambient backdrop: drifting line-colour orbs + film grain. Fixed, never scrolls. ---- */
+  .pulse-mesh {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  }
+  .pulse-mesh > i {
+    position: absolute; border-radius: 9999px; filter: blur(90px); will-change: transform;
+  }
+  .pulse-mesh > i:nth-child(1) {
+    width: 60vmax; height: 60vmax; left: -22vmax; top: -28vmax; opacity: .26;
+    background: var(--line-blue); animation: mesh-a 26s ease-in-out infinite alternate;
+  }
+  .pulse-mesh > i:nth-child(2) {
+    width: 45vmax; height: 45vmax; right: -20vmax; top: 12vh; opacity: .18;
+    background: var(--line-violet); animation: mesh-b 32s ease-in-out infinite alternate;
+  }
+  .pulse-mesh > i:nth-child(3) {
+    width: 40vmax; height: 40vmax; left: 18vw; bottom: -28vmax; opacity: .12;
+    background: var(--line-red); animation: mesh-a 30s ease-in-out infinite alternate-reverse;
+  }
+  .pulse-grain {
+    position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: .045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---- Floating glass (nav island, dock, overlays). Only on fixed elements. ---- */
+  .glass {
+    background: rgb(16 16 22 / 0.66);
+    border: 1px solid var(--border-strong);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    backdrop-filter: blur(24px) saturate(1.4);
+  }
+
+  /* ---- Double-bezel card: hairline shell + inner core with a top highlight. ---- */
+  .bezel {
+    background: rgb(255 255 255 / 0.03);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 5px;
+  }
+  .bezel-core {
+    background: rgb(14 14 20 / 0.82);
+    border-radius: 23px;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.07);
+  }
+  /* Single-layer surface for list rows, inputs, chips. */
+  .surface {
+    background: rgb(255 255 255 / 0.04);
+    border: 1px solid var(--border);
+  }
+  .surface-hover {
+    transition: background-color 300ms var(--spring), border-color 300ms var(--spring);
+  }
+  .surface-hover:hover {
+    background: rgb(255 255 255 / 0.07);
+    border-color: var(--border-strong);
+  }
+
+  /* ---- Eyebrow pill above headings. ---- */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border-strong); border-radius: 9999px;
+    padding: 4px 11px;
+    font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  /* ---- Pill CTA with nested "knob" icon (button-in-button). ---- */
+  .pill-btn {
+    display: inline-flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 5px 5px 5px 20px; border-radius: 9999px; min-height: 46px;
+    background: var(--foreground); color: var(--background);
+    font-weight: 700; font-size: 14px;
+    transition: transform 400ms var(--spring), opacity 300ms var(--spring);
+  }
+  .pill-btn:active { transform: scale(.98); }
+  .pill-btn:disabled { opacity: .4; pointer-events: none; }
+  .pill-btn .knob {
+    width: 36px; height: 36px; border-radius: 9999px; flex-shrink: 0;
+    display: grid; place-items: center; background: rgb(0 0 0 / 0.08);
+    transition: transform 500ms var(--spring);
+  }
+  .pill-btn:hover .knob { transform: translate(2px, -1px) scale(1.06); }
+  .pill-btn.ghost {
+    background: rgb(255 255 255 / 0.06); color: var(--foreground); border: 1px solid var(--border-strong);
+  }
+  .pill-btn.ghost .knob { background: rgb(255 255 255 / 0.08); }
+
+  /* Gradient headline text. */
+  .glow-text {
+    background: linear-gradient(90deg, var(--line-blue), var(--line-violet) 55%, var(--line-red));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  /* Glow helper — set --glow to a colour. */
+  .glow {
+    box-shadow: 0 0 14px var(--glow, var(--primary));
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 9999px; flex-shrink: 0;
+    background: var(--live); box-shadow: 0 0 10px var(--live);
+    animation: breathe 2s ease-in-out infinite;
+  }
+}
+
+@keyframes mesh-a { to { transform: translate(10vw, 8vh) scale(1.1); } }
+@keyframes mesh-b { to { transform: translate(-8vw, 12vh) scale(.9); } }
+@keyframes breathe { 50% { opacity: .35; transform: scale(.8); } }
 
 /* Radar-style live signal ping — used on line strips and live map markers. */
 @keyframes signal-ping {
@@ -341,33 +353,54 @@
   animation: signal-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-/* Calm urgent pulse — replaces the ElectricBorder chaos for last-train alerts.
-   A quiet, unmistakable "pay attention" without shouting. */
+/* Last-train alert — a quiet, unmistakable red glow pulse. */
 @keyframes urgent-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--destructive) 40%, transparent); }
-  50% { box-shadow: 0 0 0 6px color-mix(in oklch, var(--destructive) 0%, transparent); }
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--destructive) 45%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--destructive) 0%, transparent); }
 }
 .urgent-pulse {
   animation: urgent-pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Route-transition primitive — a 180ms fade-up applied at the shell level. */
+/* Route transition — spring fade-up on every tab/screen change. */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .page-enter {
-  animation: page-enter 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: page-enter 600ms var(--spring) both;
 }
 
-/* Departure row stagger — cheap, purposeful, one-time on mount. */
+/* Staggered entrance for cards within a page — set --i per element. */
+.rise {
+  animation: page-enter 800ms var(--spring) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 60ms);
+}
+
 @keyframes row-fade-in {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .row-fade-in {
-  animation: row-fade-in 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: row-fade-in 420ms var(--spring) both;
 }
+
+/* MapLibre controls restyled as glass. */
+.maplibregl-ctrl-group {
+  background: rgb(16 16 22 / 0.72) !important;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px !important;
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  box-shadow: none !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button + button { border-top: 1px solid var(--border) !important; }
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1); }
+.maplibregl-ctrl-attrib {
+  background: rgb(5 5 7 / 0.6) !important; color: var(--muted-foreground) !important; border-radius: 10px !important;
+}
+.maplibregl-ctrl-attrib a { color: var(--muted-foreground) !important; }
+.maplibregl-ctrl-attrib-button { filter: invert(1); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -376,4 +409,12 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Live map: keep MapLibre's controls clear of the floating nav island and dock. */
+.pulse-map .maplibregl-ctrl-top-right { top: calc(max(14px, env(safe-area-inset-top)) + 64px); }
+.pulse-map .maplibregl-ctrl-bottom-left { bottom: calc(env(safe-area-inset-bottom) + 150px); }
+@media (min-width: 768px) {
+  .pulse-map .maplibregl-ctrl-top-right { top: 76px; }
+  .pulse-map .maplibregl-ctrl-bottom-left { bottom: 70px; left: 14px; }
 }

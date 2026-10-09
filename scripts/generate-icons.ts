@@ -1,19 +1,20 @@
 /**
- * Generates the PWA icon set from one hand-authored SVG mark: a track ring
- * made of the four line colors (Blue/Red/Yellow/Violet) with a small train
- * marker riding it — the same "converging lines" idea as the live map.
+ * Generates the PWA icon set from the Pulse mark: four line-coloured arcs
+ * (Blue/Red/Yellow/Violet) orbiting one bright core — the network as a single
+ * pulse. Mirrors src/features/shell/PulseLogo.tsx.
  */
 import sharp from 'sharp';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 
 const OUT_DIR = new URL('../public/', import.meta.url);
 mkdirSync(OUT_DIR, { recursive: true });
 
-const BG = '#111726';
-const BLUE = '#2F7EFF';
-const RED = '#E23B49';
-const YELLOW = '#F2B705';
-const VIOLET = '#9B5CF6';
+const BG = '#050507';
+const BLUE = '#3D8BFF';
+const RED = '#FF4D5E';
+const YELLOW = '#FFC83D';
+const VIOLET = '#A270FF';
+const CORE = '#F4F4F6';
 
 /** Content-only mark (no background), used for the transparent "any" icons and favicon. */
 function markSvg(size: number): string {
@@ -36,7 +37,7 @@ function markSvg(size: number): string {
       ${arc(RED, 1)}
       ${arc(YELLOW, 2)}
       ${arc(VIOLET, 3)}
-      <circle cx="0" cy="${-r}" r="${size * 0.055}" fill="#ffffff"/>
+      <circle r="${size * 0.13}" fill="${CORE}"/>
     </g>
   `;
 }
@@ -76,5 +77,5 @@ for (const [name, size, svg] of tasks) {
 }
 
 // A crisp SVG favicon too (transparent, browsers handle their own chrome bg).
-await Bun.write(new URL('favicon.svg', OUT_DIR).pathname, fullSvg(64, { transparent: true }));
+writeFileSync(new URL('favicon.svg', OUT_DIR).pathname, fullSvg(64, { transparent: true }));
 console.log('wrote favicon.svg');

@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#050507" />
+<title>Pulse — Ahmedabad Metro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/*
+  CONCEPT 03 — PULSE
+  Design language: Ethereal glass / cinematic night city.
+  OLED black, line colours become light sources (glowing tracks, mesh orbs).
+  Double-bezel glass cards, floating island nav, spring-eased motion.
+  The live network is the hero — trains are moving light.
+*/
+:root {
+  --bg: #050507;
+  --ink: #F4F4F6;
+  --ink-2: rgba(244, 244, 246, .66);
+  --ink-3: rgba(244, 244, 246, .40);
+  --hair: rgba(255, 255, 255, .08);
+  --hair-2: rgba(255, 255, 255, .14);
+  --shell: rgba(255, 255, 255, .035);
+  --core: rgba(14, 14, 20, .78);
+  --blue: #3D8BFF;
+  --red: #FF4D5E;
+  --yellow: #FFC83D;
+  --violet: #A270FF;
+  --mint: #5CF2B5;
+  --display: 'Unbounded', sans-serif;
+  --sans: 'Manrope', sans-serif;
+  --mono: 'Geist Mono', ui-monospace, monospace;
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-size: 15px; line-height: 1.5;
+  overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.mono { font-family: var(--mono); font-feature-settings: "tnum"; }
+.ic { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Ambient mesh — fixed so it never repaints on scroll */
+.mesh { position: fixed; inset: 0; z-index: -2; pointer-events: none; overflow: hidden; }
+.mesh i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .32; will-change: transform; }
+.mesh i:nth-child(1) { width: 60vmax; height: 60vmax; left: -20vmax; top: -25vmax; background: var(--blue); animation: float1 26s var(--spring) infinite alternate; }
+.mesh i:nth-child(2) { width: 45vmax; height: 45vmax; right: -18vmax; top: 10vh; background: var(--violet); opacity: .24; animation: float2 32s ease-in-out infinite alternate; }
+.mesh i:nth-child(3) { width: 40vmax; height: 40vmax; left: 20vw; bottom: -25vmax; background: var(--red); opacity: .16; animation: float1 30s ease-in-out infinite alternate-reverse; }
+@keyframes float1 { to { transform: translate(10vw, 8vh) scale(1.1); } }
+@keyframes float2 { to { transform: translate(-8vw, 12vh) scale(.9); } }
+.grain { position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+/* ---------- DOUBLE BEZEL ---------- */
+.bezel { background: var(--shell); border: 1px solid var(--hair); border-radius: 28px; padding: 6px; }
+.core {
+  background: var(--core); border-radius: 22px; padding: 22px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
+  height: 100%;
+}
+.eyebrow { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--hair-2); border-radius: 999px; padding: 4px 11px; font-size: 10px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-2); }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 10px var(--mint); animation: breathe 2s ease-in-out infinite; }
+@keyframes breathe { 50% { opacity: .35; transform: scale(.8); } }
+h2 { font-family: var(--display); font-weight: 500; font-size: 20px; letter-spacing: -.02em; line-height: 1.15; }
+
+/* ---------- ISLAND NAV ---------- */
+.island {
+  position: fixed; top: max(14px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 40;
+  display: flex; align-items: center; gap: 4px; padding: 6px;
+  background: rgba(16, 16, 22, .62); border: 1px solid var(--hair-2); border-radius: 999px;
+  backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  width: max-content; max-width: calc(100% - 28px);
+}
+.logo-wrap { display: flex; align-items: center; gap: 9px; padding: 0 12px 0 6px; }
+.logo-wrap svg { width: 28px; height: 28px; }
+.logo-wrap b { font-family: var(--display); font-weight: 600; font-size: 15px; letter-spacing: -.02em; }
+.island .links { display: none; }
+.island .clock { font-family: var(--mono); font-size: 13px; padding: 7px 12px; border-radius: 999px; background: rgba(255,255,255,.06); }
+.island .burger { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.06); position: relative; }
+.burger span { position: absolute; left: 11px; right: 11px; height: 1.5px; background: var(--ink); transition: transform .5s var(--spring), top .5s var(--spring); }
+.burger span:nth-child(1) { top: 14px; } .burger span:nth-child(2) { top: 20px; }
+.menu-open .burger span:nth-child(1) { top: 17px; transform: rotate(45deg); }
+.menu-open .burger span:nth-child(2) { top: 17px; transform: rotate(-45deg); }
+
+.overlay {
+  position: fixed; inset: 0; z-index: 35; background: rgba(5, 5, 7, .82);
+  backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+  display: flex; flex-direction: column; justify-content: center; padding: 0 28px;
+  opacity: 0; pointer-events: none; transition: opacity .5s var(--spring);
+}
+.menu-open .overlay { opacity: 1; pointer-events: auto; }
+.overlay a { font-family: var(--display); font-size: clamp(2rem, 10vw, 3.5rem); font-weight: 500; letter-spacing: -.03em; padding: 6px 0; overflow: hidden; display: block; }
+.overlay a span { display: inline-block; transform: translateY(110%); opacity: 0; transition: transform .7s var(--spring), opacity .7s var(--spring); }
+.menu-open .overlay a span { transform: none; opacity: 1; }
+.overlay a:nth-child(2) span { transition-delay: .05s; } .overlay a:nth-child(3) span { transition-delay: .1s; }
+.overlay a:nth-child(4) span { transition-delay: .15s; } .overlay a:nth-child(5) span { transition-delay: .2s; }
+.overlay a small { font-family: var(--mono); font-size: 12px; color: var(--ink-3); vertical-align: super; margin-right: 10px; }
+
+/* ---------- DOCK (mobile) ---------- */
+.dock {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 40;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; padding: 6px;
+  width: min(420px, calc(100% - 28px));
+  background: rgba(16, 16, 22, .7); border: 1px solid var(--hair-2); border-radius: 999px;
+  backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,.8);
+}
+.dock a { height: 50px; border-radius: 999px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; font-weight: 600; color: var(--ink-3); transition: background .4s var(--spring), color .4s var(--spring); }
+.dock a svg { width: 21px; height: 21px; }
+.dock a[aria-current="page"] { background: var(--ink); color: var(--bg); }
+
+/* ---------- LAYOUT ---------- */
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 14px; }
+.hero { padding-top: calc(88px + env(safe-area-inset-top)); }
+.hero-head { padding: 8px 6px 22px; }
+.hero h1 { font-family: var(--display); font-weight: 500; font-size: clamp(2.2rem, 9.5vw, 5.2rem); line-height: 1; letter-spacing: -.045em; margin-top: 16px; }
+.hero h1 .glow { background: linear-gradient(90deg, var(--blue), var(--violet) 55%, var(--red)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p.sub { color: var(--ink-2); font-size: 16px; max-width: 40ch; margin-top: 14px; }
+
+.network-core { padding: 10px; position: relative; overflow: hidden; }
+.network-core svg { display: block; width: 100%; height: auto; }
+.net-label { font-family: var(--mono); font-size: 7px; fill: rgba(244,244,246,.55); letter-spacing: .04em; }
+.net-label.big { font-size: 8.5px; fill: var(--ink); }
+.net-legend { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 10px 4px; }
+.net-legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.05); border: 1px solid var(--hair); }
+.net-legend i { width: 7px; height: 7px; border-radius: 50%; }
+.net-legend .mono { color: var(--ink-3); font-weight: 400; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; margin-top: 14px; }
+.grid > *, .hero-top > * { min-width: 0; }
+
+/* Commute ring */
+.commute { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; }
+.ring { position: relative; width: 112px; height: 112px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .val { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+.ring .val b { font-family: var(--display); font-size: 34px; font-weight: 500; line-height: 1; letter-spacing: -.04em; }
+.ring .val small { display: block; font-size: 10px; color: var(--ink-3); letter-spacing: .14em; margin-top: 2px; }
+.ring circle.prog { transition: stroke-dashoffset 1s var(--spring); filter: drop-shadow(0 0 6px var(--blue)); }
+.c-route { font-family: var(--display); font-weight: 500; font-size: 19px; letter-spacing: -.02em; line-height: 1.2; }
+.c-route .arr { color: var(--blue); }
+.c-meta { display: flex; gap: 14px; margin-top: 10px; font-size: 13px; color: var(--ink-2); flex-wrap: wrap; }
+.c-meta b { color: var(--ink); font-family: var(--mono); font-weight: 500; }
+
+.pill-btn {
+  display: inline-flex; align-items: center; gap: 12px; padding: 6px 6px 6px 20px; border-radius: 999px;
+  background: var(--ink); color: var(--bg); font-weight: 700; font-size: 14px;
+  transition: transform .4s var(--spring);
+}
+.pill-btn .knob { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,.08); display: grid; place-items: center; transition: transform .5s var(--spring); }
+.pill-btn:hover .knob { transform: translate(2px, -1px) scale(1.06); }
+.pill-btn:active { transform: scale(.98); }
+.pill-btn.ghost { background: rgba(255,255,255,.06); color: var(--ink); border: 1px solid var(--hair-2); }
+.pill-btn.ghost .knob { background: rgba(255,255,255,.08); }
+.actions { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+
+/* Departures */
+.dep { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px; border-radius: 16px; transition: background .3s var(--spring); }
+.dep:hover { background: rgba(255,255,255,.04); }
+.dep .ln { width: 10px; height: 34px; border-radius: 999px; }
+.dep .to { font-weight: 700; }
+.dep .sub { font-size: 12px; color: var(--ink-3); display: flex; align-items: center; gap: 6px; }
+.load { display: inline-flex; gap: 2px; }
+.load i { width: 10px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.12); }
+.load i.on { background: var(--ink-2); }
+.dep .m { font-family: var(--display); font-size: 26px; font-weight: 500; letter-spacing: -.04em; text-align: right; line-height: 1; }
+.dep .m small { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: .14em; color: var(--ink-3); margin-top: 4px; font-weight: 600; }
+.dep .m.now { color: var(--mint); text-shadow: 0 0 18px rgba(92, 242, 181, .55); }
+
+/* Lines carousel */
+.rail { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 2px 2px 8px; margin: 0 -2px; scrollbar-width: none; }
+.rail::-webkit-scrollbar { display: none; }
+.line-card {
+  flex: 0 0 78%; scroll-snap-align: start; border-radius: 22px; padding: 18px; min-height: 170px;
+  position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+  background: rgba(255,255,255,.03); border: 1px solid var(--hair);
+  transition: transform .5s var(--spring), border-color .5s var(--spring);
+}
+.line-card::before { content: ""; position: absolute; width: 220px; height: 220px; right: -70px; top: -90px; border-radius: 50%; background: var(--c); filter: blur(50px); opacity: .45; transition: opacity .5s var(--spring); }
+.line-card:hover { transform: translateY(-3px); border-color: var(--hair-2); }
+.line-card:hover::before { opacity: .7; }
+.line-card > * { position: relative; }
+.line-card .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.line-card .tag i { width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 12px var(--c); }
+.line-card h3 { font-family: var(--display); font-weight: 500; font-size: 20px; letter-spacing: -.03em; line-height: 1.15; margin-top: 14px; }
+.line-card .foot { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; color: var(--ink-2); margin-top: 18px; }
+
+/* Planner */
+.inputs { display: grid; gap: 8px; position: relative; }
+.inp { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 18px; background: rgba(255,255,255,.04); border: 1px solid var(--hair); transition: border-color .3s var(--spring), background .3s var(--spring); }
+.inp:focus-within { border-color: rgba(61, 139, 255, .6); background: rgba(61, 139, 255, .06); }
+.inp .d { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--ink-2); }
+.inp .d.fill { background: var(--ink); border-color: var(--ink); }
+.inp label { font-size: 10px; letter-spacing: .16em; color: var(--ink-3); font-weight: 700; display: block; }
+.inp input { background: none; border: 0; color: var(--ink); font: 600 16px var(--sans); width: 100%; outline: none; }
+.swap { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; background: #16161d; border: 1px solid var(--hair-2); display: grid; place-items: center; transition: transform .6s var(--spring); }
+.swap:hover { transform: translateY(-50%) rotate(180deg); }
+.seg { display: inline-grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid var(--hair); margin-top: 12px; position: relative; }
+.seg .thumb { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; background: rgba(255,255,255,.1); transition: transform .5s var(--spring); }
+.seg[data-v="1"] .thumb { transform: translateX(100%); }
+.seg button { position: relative; padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+
+/* Places */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 9px 10px; border-radius: 999px; background: rgba(255,255,255,.04); border: 1px solid var(--hair); font-size: 13px; font-weight: 600; transition: background .3s var(--spring), border-color .3s var(--spring); }
+.chip:hover { background: rgba(255,255,255,.08); border-color: var(--hair-2); }
+.chip i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 11px; }
+.chip span { color: var(--ink-3); font-weight: 500; }
+
+footer { padding: 48px 6px 24px; color: var(--ink-3); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+/* Reveal */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s var(--spring), transform .9s var(--spring); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ---------- DESKTOP ---------- */
+@media (min-width: 900px) {
+  body { padding-bottom: 0; }
+  .dock { display: none; }
+  .island .burger { display: none; }
+  .island .links { display: flex; gap: 2px; }
+  .island .links a { padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink-2); transition: background .4s var(--spring), color .4s var(--spring); }
+  .island .links a:hover { color: var(--ink); }
+  .island .links a[aria-current="page"] { background: rgba(255,255,255,.1); color: var(--ink); }
+  .wrap { padding: 0 28px; }
+  .hero { padding-top: 120px; }
+  .hero-top { display: grid; grid-template-columns: 5fr 7fr; gap: 14px; align-items: stretch; }
+  .hero-head { display: flex; flex-direction: column; justify-content: center; padding: 20px 20px 20px 4px; }
+  .grid { grid-template-columns: repeat(12, 1fr); }
+  .c-7 { grid-column: span 7; } .c-5 { grid-column: span 5; } .c-12 { grid-column: span 12; } .c-6 { grid-column: span 6; }
+  .line-card { flex-basis: calc(25% - 9px); }
+  .core { padding: 28px; }
+}
+@media (min-width: 600px) and (max-width: 899px) { .line-card { flex-basis: 46%; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; filter: none; }
+}
+</style>
+</head>
+<body>
+<div class="mesh" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- Logo: four line-coloured arcs orbiting a single bright core — the network as one pulse. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 32 32">
+    <path d="M16 3a13 13 0 0 1 13 13" stroke="#3D8BFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M29 16a13 13 0 0 1-13 13" stroke="#FF4D5E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M16 29A13 13 0 0 1 3 16" stroke="#FFC83D" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M3 16A13 13 0 0 1 16 3" stroke="#A270FF" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="16" cy="16" r="4.5" fill="#F4F4F6"/>
+  </symbol>
+</svg>
+
+<header class="island" id="island">
+  <a class="logo-wrap" href="#"><svg><use href="#logo"/></svg><b>Pulse</b></a>
+  <nav class="links" aria-label="Primary">
+    <a href="#" aria-current="page">Now</a><a href="#network">Live map</a><a href="#lines">Lines</a><a href="#plan">Plan</a><a href="#places">Places</a>
+  </nav>
+  <span class="clock" id="clock">18:42:07</span>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
+</header>
+
+<div class="overlay" id="overlay" aria-hidden="true">
+  <a href="#"><span><small>01</small>Now</span></a>
+  <a href="#network"><span><small>02</small>Live map</span></a>
+  <a href="#lines"><span><small>03</small>Lines</span></a>
+  <a href="#plan"><span><small>04</small>Plan</span></a>
+  <a href="#places"><span><small>05</small>Places</span></a>
+</div>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-top">
+      <div class="hero-head reveal">
+        <span class="eyebrow"><span class="live-dot"></span><span id="liveTag">Live · 27 trains</span></span>
+        <h1><span id="greet">Good evening</span>,<br/><span class="glow">the city is moving.</span></h1>
+        <p class="sub">Every train on Ahmedabad Metro, in real time, computed from the official timetable. Works without a signal underground.</p>
+      </div>
+
+      <div class="bezel reveal" id="network">
+        <div class="core network-core">
+          <svg viewBox="0 0 400 300" role="img" aria-label="Live schematic of the Ahmedabad Metro network">
+            <defs>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" filter="url(#glow)">
+              <path id="pBlue"   stroke="var(--blue)"   d="M30 168 L90 170 L150 174 L190 180 L245 196 L295 222 L370 228"/>
+              <path id="pRed"    stroke="var(--red)"    d="M150 288 L168 238 L190 180 L204 134 L216 98 L232 70"/>
+              <path id="pYellow" stroke="var(--yellow)" d="M232 70 L205 58 L172 50 L140 36 L104 22"/>
+              <path id="pViolet" stroke="var(--violet)" d="M172 50 L196 34 L222 26"/>
+            </g>
+            <g fill="#050507" stroke="var(--ink)" stroke-width="2">
+              <circle cx="190" cy="180" r="6"/><circle cx="232" cy="70" r="6"/><circle cx="172" cy="50" r="6"/>
+            </g>
+            <g fill="var(--ink)">
+              <circle cx="30" cy="168" r="3"/><circle cx="370" cy="228" r="3"/><circle cx="150" cy="288" r="3"/><circle cx="104" cy="22" r="3"/><circle cx="222" cy="26" r="3"/>
+            </g>
+            <text class="net-label" x="30" y="158">THALTEJ GAM</text>
+            <text class="net-label" x="318" y="244">VASTRAL GAM</text>
+            <text class="net-label" x="158" y="292">APMC</text>
+            <text class="net-label big" x="200" y="186">OLD HIGH COURT</text>
+            <text class="net-label big" x="242" y="74">KOTESHWAR RD</text>
+            <text class="net-label big" x="118" y="62">GNLU</text>
+            <text class="net-label" x="70" y="16">MAHATMA MANDIR</text>
+            <text class="net-label" x="228" y="24">GIFT CITY</text>
+            <g id="trains"></g>
+          </svg>
+          <div class="net-legend">
+            <span><i style="background:var(--blue)"></i>Blue <b class="mono" id="nB">12</b></span>
+            <span><i style="background:var(--red)"></i>Red <b class="mono" id="nR">10</b></span>
+            <span><i style="background:var(--yellow)"></i>Yellow <b class="mono" id="nY">4</b></span>
+            <span><i style="background:var(--violet)"></i>Violet <b class="mono" id="nV">1</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <!-- Commute -->
+    <div class="bezel c-7 reveal">
+      <div class="core">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px"><h2>Commute</h2><span class="eyebrow" id="cDir">To work</span></div>
+        <div class="commute">
+          <div class="ring">
+            <svg viewBox="0 0 112 112"><circle cx="56" cy="56" r="48" stroke="rgba(255,255,255,.08)" stroke-width="7" fill="none"/><circle class="prog" id="ring" cx="56" cy="56" r="48" stroke="var(--blue)" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="100"/></svg>
+            <div class="val"><span><b id="cMin">6</b><small>MIN</small></span></div>
+          </div>
+          <div style="min-width:0">
+            <div class="c-route"><span id="cA">Thaltej</span> <span class="arr">→</span> <span id="cB">Kalupur</span></div>
+            <div class="c-meta"><span><b>22</b> min ride</span><span><b>₹15</b> fare</span><span>Blue · direct</span></div>
+          </div>
+        </div>
+        <div class="actions">
+          <a class="pill-btn" href="#">Start journey <span class="knob"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+          <button class="pill-btn ghost" id="flip">Reverse <span class="knob"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg></span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Departures -->
+    <div class="bezel c-5 reveal">
+      <div class="core">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:10px"><h2>Gurukul Road</h2><span style="font-size:12px;color:var(--ink-3)">400 m · nearest</span></div>
+        <div id="deps"></div>
+      </div>
+    </div>
+
+    <!-- Lines -->
+    <section class="c-12 reveal" id="lines" style="margin-top:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 6px 14px"><h2 style="font-size:24px">Lines</h2><span style="font-size:13px;color:var(--ink-3)">Swipe →</span></div>
+      <div class="rail">
+        <a class="line-card" href="#" style="--c:var(--blue)"><span class="tag"><i></i>Blue</span><h3>Thaltej Gam<br/>→ Vastral Gam</h3><span class="foot"><span>18 stations</span><span>06:20–23:45</span></span></a>
+        <a class="line-card" href="#" style="--c:var(--red)"><span class="tag"><i></i>Red</span><h3>APMC<br/>→ Koteshwar Road</h3><span class="foot"><span>16 stations</span><span>06:16–23:35</span></span></a>
+        <a class="line-card" href="#" style="--c:var(--yellow)"><span class="tag"><i></i>Yellow</span><h3>Koteshwar Road<br/>→ Mahatma Mandir</h3><span class="foot"><span>20 stations</span><span>06:20–22:22</span></span></a>
+        <a class="line-card" href="#" style="--c:var(--violet)"><span class="tag"><i></i>Violet</span><h3>GNLU<br/>→ GIFT City</h3><span class="foot"><span>3 stations</span><span>06:45–20:10</span></span></a>
+      </div>
+    </section>
+
+    <!-- Planner -->
+    <div class="bezel c-6 reveal" id="plan">
+      <div class="core">
+        <h2 style="margin-bottom:16px">Plan a journey</h2>
+        <div class="inputs">
+          <div class="inp"><span class="d"></span><span style="flex:1"><label for="f">FROM</label><input id="f" value="Sabarmati Railway Station" /></span></div>
+          <div class="inp"><span class="d fill"></span><span style="flex:1"><label for="t">TO</label><input id="t" value="Kankaria East" /></span></div>
+          <button class="swap" aria-label="Swap stations"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg></button>
+        </div>
+        <div class="seg" id="seg" data-v="0"><span class="thumb"></span><button data-i="0">Depart now</button><button data-i="1">Arrive by</button></div>
+        <div class="actions"><a class="pill-btn" href="#">Find route <span class="knob"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>
+      </div>
+    </div>
+
+    <!-- Places -->
+    <div class="bezel c-6 reveal" id="places">
+      <div class="core">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px"><h2>Go somewhere</h2><span style="font-size:12px;color:var(--ink-3)">26 places</span></div>
+        <div class="chips">
+          <a class="chip" href="#"><i style="background:rgba(92,242,181,.15);color:var(--mint)">◆</i>Kankaria Lake <span>Kankaria E.</span></a>
+          <a class="chip" href="#"><i style="background:rgba(255,200,61,.15);color:var(--yellow)">◆</i>Sabarmati Ashram <span>Usmanpura</span></a>
+          <a class="chip" href="#"><i style="background:rgba(61,139,255,.15);color:var(--blue)">◆</i>Riverfront <span>Old High Court</span></a>
+          <a class="chip" href="#"><i style="background:rgba(162,112,255,.15);color:var(--violet)">◆</i>Railway Station <span>Kalupur</span></a>
+          <a class="chip" href="#"><i style="background:rgba(255,77,94,.15);color:var(--red)">◆</i>Civil Hospital <span>Shahpur</span></a>
+          <a class="chip" href="#"><i style="background:rgba(61,139,255,.15);color:var(--blue)">◆</i>IIM Ahmedabad <span>Gujarat Univ.</span></a>
+          <a class="chip" href="#"><i style="background:rgba(255,200,61,.15);color:var(--yellow)">◆</i>Ahmedabad One <span>Gurukul Rd</span></a>
+          <a class="chip" href="#"><i style="background:rgba(92,242,181,.15);color:var(--mint)">◆</i>Motera Stadium <span>Motera</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer><span>Pulse · unofficial Ahmedabad Metro companion</span><span class="mono">GMRC timetable · offline ready</span></footer>
+</main>
+
+<nav class="dock" aria-label="Primary">
+  <a href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.5"/></svg>Now</a>
+  <a href="#network"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l5-2 6 2 5-2v14l-5 2-6-2-5 2z"/></svg>Map</a>
+  <a href="#lines"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Lines</a>
+  <a href="#plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h6a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8"/></svg>Plan</a>
+  <a href="#places"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Places</a>
+</nav>
+
+<script>
+// Mock data — the real app computes positions from the GMRC timetable.
+const ist = () => new Date(Date.now() + (330 + new Date().getTimezoneOffset()) * 60000);
+const pad = n => String(n).padStart(2, '0');
+const headway = h => (h >= 8 && h < 11) || (h >= 17 && h < 20) ? 8 : 12;
+const nextIn = (mins, h, off) => { const f = h - ((mins + off) % h); return f === h ? 0 : f; };
+
+// Trains per line per direction; [pathId, colour, count, run seconds]
+const LINES = [['pBlue', '--blue', 6, 3000], ['pRed', '--red', 5, 2700], ['pYellow', '--yellow', 2, 2400], ['pViolet', '--violet', 1, 600]];
+const NS = 'http://www.w3.org/2000/svg', g = document.getElementById('trains');
+const dots = LINES.flatMap(([id, col, n, run]) => {
+  const path = document.getElementById(id), len = path.getTotalLength();
+  return Array.from({ length: n * 2 }, (_, i) => {
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('r', 3.6); c.setAttribute('fill', '#fff');
+    c.style.filter = `drop-shadow(0 0 4px var(${col})) drop-shadow(0 0 8px var(${col}))`;
+    g.appendChild(c);
+    return { c, path, len, run, phase: (i % n) / n + (i >= n ? .5 / n : 0), back: i >= n };
+  });
+});
+
+function animate() {
+  const d = ist(), s = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds() + d.getMilliseconds() / 1000;
+  for (const t of dots) {
+    let p = (s / t.run + t.phase) % 1;
+    if (t.back) p = 1 - p;
+    const pt = t.path.getPointAtLength(p * t.len);
+    t.c.setAttribute('cx', pt.x); t.c.setAttribute('cy', pt.y);
+  }
+  requestAnimationFrame(animate);
+}
+
+let toWork = true;
+function tick() {
+  const d = ist(), h = d.getHours(), mins = h * 60 + d.getMinutes(), hw = headway(h);
+  const running = mins >= 376 && mins <= 1425;
+  document.getElementById('clock').textContent = `${pad(h)}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  document.getElementById('greet').textContent = h < 4 ? 'Late night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 21 ? 'Good evening' : 'Good night';
+  document.getElementById('liveTag').textContent = running ? `Live · ${hw === 8 ? 34 : 27} trains` : 'No service · resumes 06:16';
+
+  const c = nextIn(mins, hw, toWork ? 7 : 2);
+  document.getElementById('cMin').textContent = c;
+  // Ring drains as departure approaches (full ring = one headway away).
+  const secsLeft = c * 60 - d.getSeconds();
+  document.getElementById('ring').style.strokeDashoffset = 301.6 * (1 - Math.max(0, secsLeft) / (hw * 60));
+
+  const deps = [{ to: 'Vastral Gam', off: 3 }, { to: 'Thaltej Gam', off: 7 }]
+    .flatMap(x => [0, 1].map(k => ({ ...x, t: nextIn(mins, hw, x.off) + k * hw }))).sort((a, b) => a.t - b.t).slice(0, 4);
+  document.getElementById('deps').innerHTML = deps.map((x, i) => {
+    const load = (x.t + i) % 4 + 1;
+    return `<div class="dep"><span class="ln" style="background:var(--blue);box-shadow:0 0 14px var(--blue)"></span>
+      <span><div class="to">${x.to}</div><div class="sub">Blue Line · <span class="load">${[1,2,3,4].map(k => `<i class="${k <= load ? 'on' : ''}"></i>`).join('')}</span></div></span>
+      <span class="m ${x.t === 0 ? 'now' : ''}">${x.t === 0 ? 'Now' : x.t}<small>${x.t === 0 ? 'BOARD' : 'MIN'}</small></span></div>`;
+  }).join('');
+}
+
+document.getElementById('flip').addEventListener('click', () => {
+  toWork = !toWork;
+  document.getElementById('cA').textContent = toWork ? 'Thaltej' : 'Kalupur';
+  document.getElementById('cB').textContent = toWork ? 'Kalupur' : 'Thaltej';
+  document.getElementById('cDir').textContent = toWork ? 'To work' : 'To home';
+  tick();
+});
+document.querySelectorAll('#seg button').forEach(b => b.addEventListener('click', () => { document.getElementById('seg').dataset.v = b.dataset.i; }));
+document.querySelector('.swap').addEventListener('click', () => {
+  const f = document.getElementById('f'), t = document.getElementById('t'); [f.value, t.value] = [t.value, f.value];
+});
+const burger = document.getElementById('burger');
+const toggleMenu = open => {
+  document.body.classList.toggle('menu-open', open);
+  burger.setAttribute('aria-expanded', open);
+  document.getElementById('overlay').setAttribute('aria-hidden', !open);
+};
+burger.addEventListener('click', () => toggleMenu(!document.body.classList.contains('menu-open')));
+document.querySelectorAll('.overlay a').forEach(a => a.addEventListener('click', () => toggleMenu(false)));
+
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+tick(); setInterval(tick, 1000);
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>
