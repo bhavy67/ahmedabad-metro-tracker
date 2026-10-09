@@ -1,8 +1,11 @@
 import { useParams, Link, Navigate } from 'react-router';
-import { IconStar, IconStarFilled, IconTrain, IconBuildingArch, IconArrowsExchange, IconArrowLeft } from '@tabler/icons-react';
+import {
+  IconStar, IconStarFilled, IconBuildingArch, IconArrowsExchange, IconArrowLeft, IconArrowUpRight,
+} from '@tabler/icons-react';
 import { getStation, network } from '@/src/lib/metro/network.ts';
 import { useFavourites } from '@/src/hooks/useFavourites.ts';
 import { formatScheduleTime12 } from '@/src/lib/metro/clock.ts';
+import { Bezel } from '@/components/Bezel.tsx';
 import { DepartureBoard } from './DepartureBoard.tsx';
 import { LastTrainStrip } from './LastTrainStrip.tsx';
 
@@ -17,105 +20,124 @@ export function StationPage() {
   const favourite = isFavourite(station.id);
 
   return (
-    <div className="pb-8">
-      {/* Line-color wash header — the brand color carries the station identity. */}
-      <div
-        className="relative border-b border-border px-4 pt-4 pb-5"
-        style={{
-          background: `linear-gradient(180deg, color-mix(in oklch, var(--line-${primaryLine}) 22%, var(--card)) 0%, var(--card) 100%)`,
-        }}
-      >
-        <div className="mb-3 flex items-center justify-between">
+    <div className="mx-auto w-full max-w-[1240px] px-3.5 md:px-7">
+      <header className="rise relative px-1.5 pb-7">
+        {/* The station's line colour lights the header from behind. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -top-28 -left-16 h-80 w-80 rounded-full opacity-30 blur-[90px]"
+          style={{ backgroundColor: `var(--line-${primaryLine})` }}
+        />
+
+        <div className="relative mb-6 flex items-center justify-between">
           <Link
             to="/"
             aria-label="Back to home"
-            className="press flex h-9 w-9 items-center justify-center rounded-full bg-background/70 text-foreground shadow-sm backdrop-blur"
+            className="press surface surface-hover flex h-10 w-10 items-center justify-center rounded-full"
           >
-            <IconArrowLeft size={18} />
+            <IconArrowLeft size={18} stroke={1.75} />
           </Link>
           <button
             type="button"
             onClick={() => toggle(station.id)}
             aria-pressed={favourite}
             aria-label={favourite ? 'Remove from favourites' : 'Add to favourites'}
-            className="press flex h-11 w-11 items-center justify-center rounded-full bg-background/70 text-foreground shadow-sm backdrop-blur"
+            className="press surface surface-hover flex h-11 items-center gap-2 rounded-full px-4 text-[13px] font-bold"
           >
             {favourite ? (
-              <IconStarFilled size={22} className="text-line-yellow" />
+              <IconStarFilled size={18} className="text-line-yellow" style={{ filter: 'drop-shadow(0 0 6px var(--line-yellow))' }} />
             ) : (
-              <IconStar size={22} className="text-muted-foreground" />
+              <IconStar size={18} stroke={1.75} className="text-muted-foreground" />
             )}
+            {favourite ? 'Saved' : 'Save'}
           </button>
         </div>
 
-        <h1 className="font-display text-[28px] font-semibold leading-tight tracking-tight text-foreground">
-          {station.name}
-        </h1>
-        <p className="mt-1 text-[13px] text-muted-foreground">
-          {station.nameGu} · {station.nameHi}
-        </p>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="relative flex flex-wrap items-center gap-2">
           {station.lines.map(line => (
             <Link
               key={line}
               to={`/line/${line}`}
-              className="press inline-flex items-center rounded-full px-3 py-1 font-display text-[12px] font-bold uppercase tracking-wide shadow-sm"
-              style={{ backgroundColor: `var(--line-${line})`, color: `var(--line-${line}-ink)` }}
+              className="press surface surface-hover inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold tracking-[0.14em] uppercase"
             >
-              {network.lines[line].name} Line
+              <span
+                className="h-2 w-2 rounded-full"
+                style={{ backgroundColor: `var(--line-${line})`, boxShadow: `0 0 10px var(--line-${line})` }}
+              />
+              {network.lines[line].name}
             </Link>
           ))}
+        </div>
+
+        <h1 className="relative mt-4 font-display text-[clamp(2rem,8vw,3.6rem)] leading-[1.02] font-medium tracking-[-0.045em]">
+          {station.name}
+        </h1>
+        <p className="relative mt-2 text-[15px] text-muted-foreground">
+          {station.nameGu} · {station.nameHi}
+        </p>
+
+        <div className="relative mt-4 flex flex-wrap gap-2 text-[12px] font-semibold text-muted-foreground">
           {station.isInterchange && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/60 px-2.5 py-1 text-[12px] font-medium text-foreground backdrop-blur">
-              <IconArrowsExchange size={13} /> Interchange
+            <span className="surface inline-flex items-center gap-1.5 rounded-full px-3 py-1.5">
+              <IconArrowsExchange size={14} stroke={1.75} /> Interchange
             </span>
           )}
-          <span className="inline-flex items-center gap-1 rounded-full border border-border bg-background/60 px-2.5 py-1 text-[12px] font-medium text-foreground backdrop-blur">
-            <IconBuildingArch size={13} /> {station.isUnderground ? 'Underground' : 'Elevated'}
+          <span className="surface inline-flex items-center gap-1.5 rounded-full px-3 py-1.5">
+            <IconBuildingArch size={14} stroke={1.75} /> {station.isUnderground ? 'Underground' : 'Elevated'}
           </span>
         </div>
-      </div>
+      </header>
 
-      <LastTrainStrip stationId={station.id} />
-
-      <section className="px-4 pt-4">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="flex items-center gap-1.5 font-display text-[15px] font-semibold">
-            <IconTrain size={16} className="text-primary" /> Next departures
-          </h2>
-          <span className="text-[12px] text-muted-foreground">Live</span>
-        </div>
-        <div className="rounded-2xl border border-border bg-card px-4 shadow-sm">
+      <div className="grid gap-3.5 lg:grid-cols-12">
+        <Bezel className="rise lg:col-span-7" coreClassName="p-2 md:p-2" style={{ '--i': 1 } as React.CSSProperties}>
+          <div className="flex items-center justify-between px-3 pt-3 pb-2">
+            <h2 className="font-display text-[19px] font-medium tracking-tight">Next departures</h2>
+            <span className="eyebrow">
+              <span className="live-dot" /> Live
+            </span>
+          </div>
+          <LastTrainStrip stationId={station.id} />
           <DepartureBoard stationId={station.id} limit={10} />
-        </div>
-      </section>
+        </Bezel>
 
-      <section className="mt-5 px-4">
-        <h2 className="mb-2 font-display text-[15px] font-semibold">Service hours</h2>
-        <div className="space-y-2">
-          {station.lines.map(line => {
-            const l = network.lines[line];
-            return (
-              <div
-                key={line}
-                className="flex items-center justify-between rounded-xl border border-border bg-card px-3.5 py-3 shadow-sm"
-              >
-                <span className="flex items-center gap-2 text-[14px] font-medium">
-                  <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: `var(--line-${line})` }}
-                  />
-                  {l.name} Line
-                </span>
-                <span className="tnum font-mono text-[13px] text-muted-foreground">
-                  {formatScheduleTime12(l.firstDeparture)} – {formatScheduleTime12(l.lastArrival)}
-                </span>
-              </div>
-            );
-          })}
+        <div className="flex flex-col gap-3.5 lg:col-span-5">
+          <Bezel className="rise" style={{ '--i': 2 } as React.CSSProperties}>
+            <h2 className="mb-3 font-display text-[19px] font-medium tracking-tight">Service hours</h2>
+            <div className="flex flex-col gap-2">
+              {station.lines.map(line => {
+                const l = network.lines[line];
+                return (
+                  <div key={line} className="surface flex items-center justify-between gap-3 rounded-[18px] px-4 py-3">
+                    <span className="flex items-center gap-2.5 text-[14px] font-bold">
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: `var(--line-${line})`, boxShadow: `0 0 10px var(--line-${line})` }}
+                      />
+                      {l.name}
+                    </span>
+                    <span className="tnum font-mono text-[13px] text-muted-foreground">
+                      {formatScheduleTime12(l.firstDeparture)} – {formatScheduleTime12(l.lastArrival)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </Bezel>
+
+          <Bezel className="rise" style={{ '--i': 3 } as React.CSSProperties}>
+            <h2 className="font-display text-[19px] font-medium tracking-tight">Going somewhere?</h2>
+            <p className="mt-1 mb-5 text-[13px] text-muted-foreground">
+              Plan the fastest route from {station.name}, with fare and changes.
+            </p>
+            <Link to={`/plan?from=${station.id}`} className="pill-btn">
+              Plan from here
+              <span className="knob">
+                <IconArrowUpRight size={17} stroke={1.75} />
+              </span>
+            </Link>
+          </Bezel>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

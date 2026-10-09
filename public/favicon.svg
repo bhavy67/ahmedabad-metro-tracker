@@ -2,19 +2,19 @@
     
     
     <g transform="translate(32 32)">
-      <circle r="21.76" fill="none" stroke="#2F7EFF" stroke-width="5.76" stroke-linecap="round"
+      <circle r="21.76" fill="none" stroke="#3D8BFF" stroke-width="5.76" stroke-linecap="round"
        stroke-dasharray="30.76247526395126 105.95963702027656" stroke-dashoffset="0"
        transform="rotate(-90)"/>
-      <circle r="21.76" fill="none" stroke="#E23B49" stroke-width="5.76" stroke-linecap="round"
+      <circle r="21.76" fill="none" stroke="#FF4D5E" stroke-width="5.76" stroke-linecap="round"
        stroke-dasharray="30.76247526395126 105.95963702027656" stroke-dashoffset="-34.180528071056955"
        transform="rotate(-90)"/>
-      <circle r="21.76" fill="none" stroke="#F2B705" stroke-width="5.76" stroke-linecap="round"
+      <circle r="21.76" fill="none" stroke="#FFC83D" stroke-width="5.76" stroke-linecap="round"
        stroke-dasharray="30.76247526395126 105.95963702027656" stroke-dashoffset="-68.36105614211391"
        transform="rotate(-90)"/>
-      <circle r="21.76" fill="none" stroke="#9B5CF6" stroke-width="5.76" stroke-linecap="round"
+      <circle r="21.76" fill="none" stroke="#A270FF" stroke-width="5.76" stroke-linecap="round"
        stroke-dasharray="30.76247526395126 105.95963702027656" stroke-dashoffset="-102.54158421317086"
        transform="rotate(-90)"/>
-      <circle cx="0" cy="-21.76" r="3.52" fill="#ffffff"/>
+      <circle r="8.32" fill="#F4F4F6"/>
     </g>
   
   </svg>

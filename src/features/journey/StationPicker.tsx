@@ -39,26 +39,25 @@ export function StationPicker({
 
   return (
     <Drawer open={open} onOpenChange={open => { setOpen(open); if (!open) setQuery(''); }} showSwipeHandle>
-      <DrawerTrigger className="press flex w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 py-3.5 text-left shadow-sm">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
-          <Icon size={18} />
-        </span>
+      <DrawerTrigger className="press surface surface-hover flex w-full items-center gap-3 rounded-[20px] py-3 pr-3 pl-4 text-left">
+        <span
+          className={icon === 'from' ? 'h-2.5 w-2.5 shrink-0 rounded-full border-2 border-muted-foreground' : 'h-2.5 w-2.5 shrink-0 rounded-full bg-foreground'}
+          aria-hidden
+        />
         <span className="min-w-0 flex-1">
-          <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            {label}
-          </span>
-          <span className="block truncate font-display text-[15px] font-semibold text-foreground">
+          <span className="block text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">{label}</span>
+          <span className={value ? 'block truncate text-[16px] font-bold' : 'block truncate text-[16px] font-semibold text-muted-foreground'}>
             {value ? value.name : 'Select a station'}
           </span>
         </span>
-        <IconChevronRight size={18} className="text-muted-foreground" />
+        <Icon size={17} stroke={1.75} className="shrink-0 text-muted-foreground" />
       </DrawerTrigger>
 
       <DrawerContent style={{ '--drawer-height': '85dvh' } as React.CSSProperties}>
         <DrawerHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <DrawerTitle className="font-display text-[17px] font-semibold">{label}</DrawerTitle>
-            <DrawerClose render={<button type="button" aria-label="Close" className="press flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground" />}>
+            <DrawerTitle>{label}</DrawerTitle>
+            <DrawerClose render={<button type="button" aria-label="Close" className="press flex h-9 w-9 items-center justify-center rounded-full bg-white/6 text-muted-foreground hover:bg-white/10 hover:text-foreground" />}>
               <IconX size={18} />
             </DrawerClose>
           </div>
@@ -66,16 +65,16 @@ export function StationPicker({
 
         <div className="flex min-h-0 flex-1 flex-col px-4 pb-4">
           <div className="relative mb-3 shrink-0">
-            <IconSearch size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <IconSearch size={17} stroke={1.75} className="absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground" />
             <input
               autoFocus
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search stations…"
-              className="h-11 w-full rounded-xl border border-border bg-background pl-10 pr-3 text-[15px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
+              className="surface h-12 w-full rounded-full pr-4 pl-11 text-[15px] outline-none transition-colors focus:border-primary/60 focus:bg-primary/6"
             />
           </div>
-          <ul className="min-h-0 flex-1 divide-y divide-border overflow-y-auto">
+          <ul className="-mx-1 min-h-0 flex-1 overflow-y-auto">
             {results.map(station => (
               <li key={station.id}>
                 <button
@@ -85,20 +84,24 @@ export function StationPicker({
                     setOpen(false);
                     setQuery('');
                   }}
-                  className="press flex w-full items-center gap-3 py-3 text-left"
+                  className="press flex w-full items-center gap-3 rounded-[16px] px-3 py-3 text-left hover:bg-white/5"
                 >
-                  <span className="flex shrink-0 gap-0.5">
+                  <span className="flex w-7 shrink-0 gap-1">
                     {station.lines.map(line => (
-                      <span key={line} className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: `var(--line-${line})` }} />
+                      <span
+                        key={line}
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: `var(--line-${line})`, boxShadow: `0 0 8px var(--line-${line})` }}
+                      />
                     ))}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[15px] font-semibold text-foreground">{station.name}</span>
+                    <span className="block text-[15px] font-bold text-foreground">{station.name}</span>
                     {station.isInterchange && (
                       <span className="block text-[12px] text-muted-foreground">Interchange</span>
                     )}
                   </span>
-                  <IconChevronRight size={16} className="text-muted-foreground" />
+                  <IconChevronRight size={16} stroke={1.75} className="text-muted-foreground" />
                 </button>
               </li>
             ))}

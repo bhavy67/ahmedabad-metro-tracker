@@ -1,15 +1,16 @@
 import { Link } from 'react-router';
-import { IconLocation, IconStar, IconLoader2, IconChevronRight, IconMapPin, IconRoute } from '@tabler/icons-react';
+import { IconLocation, IconLoader2, IconArrowUpRight, IconStarFilled, IconMap2 } from '@tabler/icons-react';
 import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
 import { useNearestStation } from '@/src/hooks/useNearestStation.ts';
 import { useFavourites } from '@/src/hooks/useFavourites.ts';
-import { useLiveTrains } from '@/src/hooks/useLiveTrains.ts';
+import { useLiveCounts } from '@/src/hooks/useLiveTrains.ts';
 import { LINE_IDS, network, getStation } from '@/src/lib/metro/network.ts';
-import { formatClock12, formatScheduleTime12 } from '@/src/lib/metro/clock.ts';
+import { formatScheduleTime12 } from '@/src/lib/metro/clock.ts';
 import { DepartureBoard } from '@/src/features/station/DepartureBoard.tsx';
 import { LastTrainStrip } from '@/src/features/station/LastTrainStrip.tsx';
 import { CommuteCard } from '@/src/features/commute/CommuteCard.tsx';
-import { Button } from '@/components/ui/button';
+import { NetworkPulse } from '@/src/features/map/NetworkPulse.tsx';
+import { Bezel } from '@/components/Bezel.tsx';
 import { BuildFooter } from '@/src/features/pwa/BuildFooter.tsx';
 
 function greeting(secondsOfDay: number): string {
@@ -25,178 +26,207 @@ export function HomePage() {
   const clock = useMetroClock();
   const nearest = useNearestStation();
   const { favourites } = useFavourites();
-  const trains = useLiveTrains();
-  const { time, meridiem } = formatClock12(clock.secondsOfDay);
+  const counts = useLiveCounts();
+  const total = LINE_IDS.reduce((n, l) => n + counts[l], 0);
 
   return (
-    <div className="pb-8">
-      {/* Hero — greeting + status on the left, prominent live clock on the right. */}
-      <section className="px-4 pt-5 pb-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-muted-foreground">{greeting(clock.secondsOfDay)}</p>
-            <h1 className="mt-1 font-display text-[26px] font-semibold leading-tight tracking-tight">
-              {trains.length > 0 ? 'Metro is running' : 'No trains right now'}
-            </h1>
-            <p className="mt-2 text-[14px] text-muted-foreground">
-              <span className="tnum font-mono text-[16px] font-semibold text-foreground">
-                {trains.length}
-              </span>{' '}
-              train{trains.length === 1 ? '' : 's'} live across the network
-            </p>
-          </div>
-          <div className="shrink-0 text-right">
-            <p className="tnum font-mono text-[30px] font-bold leading-none tracking-tight text-foreground">
-              {time}
-            </p>
-            <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-              {meridiem} · IST
-            </p>
-          </div>
+    <div className="mx-auto w-full max-w-[1240px] px-3.5 md:px-7">
+      {/* Hero — headline on the left, the live network as a field of light on the right. */}
+      <section className="grid gap-3.5 lg:grid-cols-12">
+        <div className="rise flex flex-col justify-center px-1.5 pt-2 pb-4 lg:col-span-5 lg:pr-6">
+          <span className="eyebrow self-start">
+            <span className="live-dot" />
+            {total > 0 ? `Live · ${total} train${total === 1 ? '' : 's'}` : 'No service right now'}
+          </span>
+          <h1 className="mt-4 font-display text-[clamp(2rem,7.6vw,3.6rem)] leading-[1.02] font-medium tracking-[-0.045em]">
+            {greeting(clock.secondsOfDay)},
+            <br />
+            <span className="glow-text">{total > 0 ? 'the city is moving.' : 'the metro is resting.'}</span>
+          </h1>
+          <p className="mt-4 max-w-[40ch] text-[15px] text-muted-foreground md:text-[16px]">
+            Every train on Ahmedabad Metro, in real time, computed from the official GMRC timetable. Works without
+            signal underground.
+          </p>
         </div>
-      </section>
 
-      {/* Commute card */}
-      <section className="px-4 pt-4">
-        <CommuteCard />
-      </section>
-
-      {/* Nearest station — primary destination card. */}
-      <section className="px-4 pt-4">
-        {nearest.status === 'idle' || nearest.status === 'error' ? (
-          <div className="rounded-2xl border border-dashed border-border-strong bg-card-muted/50 px-5 py-6 text-center">
-            <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <IconLocation size={22} />
-            </div>
-            <p className="mb-3 text-[15px] font-medium text-foreground">Find the nearest station</p>
-            <p className="mx-auto mb-4 max-w-[26ch] text-[13px] text-muted-foreground">
-              See live departures from wherever you are right now.
-            </p>
-            <Button onClick={nearest.locate} className="h-11 px-5 text-sm">
-              Use my location
-            </Button>
-            {nearest.status === 'error' && (
-              <p className="mt-3 text-[12px] text-destructive">{nearest.errorMessage}</p>
-            )}
-          </div>
-        ) : nearest.status === 'locating' ? (
-          <div className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-6 text-sm text-muted-foreground">
-            <IconLoader2 size={16} className="animate-spin" /> Locating you…
-          </div>
-        ) : nearest.station ? (
-          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-            <div className="flex items-center gap-3 px-4 py-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
-                <IconMapPin size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Nearest station
-                </p>
-                <p className="truncate font-display text-[17px] font-semibold leading-tight">
-                  {nearest.station.name}
-                </p>
-                <p className="text-[12px] text-muted-foreground">
-                  {Math.round((nearest.distanceMeters ?? 0) / 100) / 10} km away
-                </p>
-              </div>
+        <Bezel className="rise lg:col-span-7" coreClassName="relative p-2.5 md:p-3" style={{ '--i': 1 } as React.CSSProperties}>
+          <NetworkPulse />
+          <div className="flex flex-wrap items-center gap-1.5 px-1.5 pt-2 pb-1">
+            {LINE_IDS.map(line => (
               <Link
-                to={`/station/${nearest.station.id}`}
-                className="press flex h-9 items-center gap-0.5 rounded-full bg-accent px-3 text-[13px] font-medium text-foreground"
+                key={line}
+                to={`/line/${line}`}
+                className="press surface surface-hover inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-bold"
               >
-                Board <IconChevronRight size={14} />
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: `var(--line-${line})`, boxShadow: `0 0 8px var(--line-${line})` }}
+                />
+                {network.lines[line].name}
+                <span className="tnum font-mono font-normal text-muted-foreground">{counts[line]}</span>
               </Link>
-            </div>
-            <div className="border-t border-border px-4 py-1">
-              <DepartureBoard stationId={nearest.station.id} limit={3} />
-            </div>
+            ))}
+            <Link
+              to="/map"
+              className="press ml-auto inline-flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1 text-[12px] font-bold hover:bg-white/12"
+            >
+              <IconMap2 size={14} stroke={1.75} /> Live map
+            </Link>
           </div>
-        ) : null}
+        </Bezel>
+      </section>
+
+      <section className="mt-3.5 grid gap-3.5 lg:grid-cols-12">
+        <CommuteCard className="rise lg:col-span-7" style={{ '--i': 2 } as React.CSSProperties} />
+        <NearestCard nearest={nearest} />
       </section>
 
       {favourites.length > 0 && (
-        <section className="px-4 pt-6">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="flex items-center gap-1.5 font-display text-[15px] font-semibold">
-              <IconStar size={16} className="text-line-yellow" fill="currentColor" /> Favourites
-            </h2>
-            <span className="text-[12px] text-muted-foreground">{favourites.length} saved</span>
-          </div>
-          <div className="space-y-3">
-            {favourites.map(id => {
+        <section className="mt-10">
+          <SectionHeading title="Favourites" aside={`${favourites.length} saved`} />
+          <div className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-3">
+            {favourites.map((id, i) => {
               const station = getStation(id);
               if (!station) return null;
               return (
-                <div key={id} className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-                  <div className="flex items-center justify-between gap-2 px-4 py-3">
-                    <Link
-                      to={`/station/${id}`}
-                      className="min-w-0 flex-1 font-display text-[16px] font-semibold hover:underline"
-                    >
+                <Bezel key={id} className="rise" coreClassName="p-2 md:p-2" style={{ '--i': i + 3 } as React.CSSProperties}>
+                  <div className="flex items-center gap-2 px-3 pt-3 pb-1">
+                    <IconStarFilled size={15} className="text-line-yellow" />
+                    <Link to={`/station/${id}`} className="min-w-0 flex-1 truncate font-display text-[17px] font-medium tracking-tight">
                       {station.name}
                     </Link>
-                    <Link
-                      to={`/station/${id}`}
-                      className="press flex h-8 items-center gap-0.5 rounded-full bg-accent px-2.5 text-[12px] font-medium text-foreground"
-                    >
-                      Board <IconChevronRight size={12} />
-                    </Link>
+                    <BoardLink to={`/station/${id}`} />
                   </div>
                   <LastTrainStrip stationId={id} />
-                  <div className="border-t border-border px-4 py-1">
-                    <DepartureBoard stationId={id} limit={3} />
-                  </div>
-                </div>
+                  <DepartureBoard stationId={id} limit={3} />
+                </Bezel>
               );
             })}
           </div>
         </section>
       )}
 
-      {/* Lines — horizontal scroll of full-color cards. Brand identity gets a real hero moment. */}
-      <section className="pt-6">
-        <div className="mb-2 flex items-center justify-between px-4">
-          <h2 className="flex items-center gap-1.5 font-display text-[15px] font-semibold">
-            <IconRoute size={16} className="text-muted-foreground" /> Lines
-          </h2>
-          <span className="text-[12px] text-muted-foreground">Tap to explore</span>
-        </div>
-        <div className="scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 lg:grid lg:grid-cols-2 lg:overflow-visible lg:snap-none">
+      {/* Lines — glowing cards; swipe on mobile, a 4-up row on desktop. */}
+      <section className="mt-10">
+        <SectionHeading title="Lines" aside={<span className="md:hidden">Swipe →</span>} />
+        <div className="scrollbar-hidden -mx-3.5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3.5 pb-2 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 lg:grid-cols-4">
           {LINE_IDS.map(line => {
             const l = network.lines[line];
             return (
               <Link
                 key={line}
                 to={`/line/${line}`}
-                className="press flex w-[68%] shrink-0 snap-start flex-col justify-between rounded-2xl p-4 shadow-sm lg:w-auto"
-                style={{
-                  backgroundColor: `var(--line-${line})`,
-                  color: `var(--line-${line}-ink)`,
-                  minHeight: 132,
-                }}
+                className="group relative flex min-h-[176px] w-[78%] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-[24px] border border-border bg-white/3 p-5 transition-[transform,border-color] duration-500 ease-(--spring) hover:-translate-y-1 hover:border-border-strong sm:w-[46%] md:w-auto"
               >
-                <div>
-                  <span className="inline-block rounded-full bg-black/15 px-2 py-0.5 font-display text-[11px] font-bold uppercase tracking-wide">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -top-24 -right-16 h-56 w-56 rounded-full opacity-45 blur-[50px] transition-opacity duration-500 group-hover:opacity-75"
+                  style={{ backgroundColor: `var(--line-${line})` }}
+                />
+                <span className="relative flex items-center justify-between">
+                  <span className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.14em] uppercase">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: `var(--line-${line})`, boxShadow: `0 0 12px var(--line-${line})` }}
+                    />
                     {l.name}
                   </span>
-                  <p className="mt-2.5 font-display text-[15px] font-semibold leading-tight">
-                    {l.from}
-                    <span className="mx-1 opacity-70">→</span>
-                    {l.to}
-                  </p>
-                </div>
-                <p className="tnum mt-3 font-mono text-[12px] font-medium opacity-90">
-                  {formatScheduleTime12(l.firstDeparture)} – {formatScheduleTime12(l.lastArrival)}
-                </p>
+                  <span className="tnum font-mono text-[12px] text-muted-foreground">{counts[line]} live</span>
+                </span>
+                <span className="relative mt-4 font-display text-[19px] leading-tight font-medium tracking-[-0.03em]">
+                  {l.from}
+                  <br />→ {l.to}
+                </span>
+                <span className="tnum relative mt-5 flex justify-between font-mono text-[12px] text-muted-foreground">
+                  <span>{l.stations.length} stations</span>
+                  <span>
+                    {formatScheduleTime12(l.firstDeparture)} – {formatScheduleTime12(l.lastArrival)}
+                  </span>
+                </span>
               </Link>
             );
           })}
         </div>
       </section>
 
-      <section className="px-4 pt-8">
+      <section className="mt-10">
         <BuildFooter />
       </section>
+    </div>
+  );
+}
+
+function NearestCard({ nearest }: { nearest: ReturnType<typeof useNearestStation> }) {
+  const style = { '--i': 3 } as React.CSSProperties;
+
+  if (nearest.status === 'ready' && nearest.station) {
+    return (
+      <Bezel className="rise lg:col-span-5" coreClassName="p-2 md:p-2" style={style}>
+        <div className="flex items-start gap-3 px-3 pt-3 pb-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Nearest station</p>
+            <p className="mt-1 truncate font-display text-[20px] leading-tight font-medium tracking-tight">{nearest.station.name}</p>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">
+              {Math.round((nearest.distanceMeters ?? 0) / 100) / 10} km away
+            </p>
+          </div>
+          <BoardLink to={`/station/${nearest.station.id}`} />
+        </div>
+        <DepartureBoard stationId={nearest.station.id} limit={4} />
+      </Bezel>
+    );
+  }
+
+  return (
+    <Bezel className="rise lg:col-span-5" coreClassName="flex flex-col items-center justify-center px-6 py-9 text-center" style={style}>
+      {nearest.status === 'locating' ? (
+        <p className="flex items-center gap-2 text-[14px] text-muted-foreground">
+          <IconLoader2 size={16} className="animate-spin" /> Locating you…
+        </p>
+      ) : (
+        <>
+          <span
+            className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/14 text-primary"
+            style={{ boxShadow: '0 0 40px -6px var(--primary)' }}
+          >
+            <IconLocation size={22} stroke={1.5} />
+          </span>
+          <p className="font-display text-[18px] font-medium tracking-tight">Find the nearest station</p>
+          <p className="mx-auto mt-1.5 mb-5 max-w-[28ch] text-[13px] text-muted-foreground">
+            See live departures from wherever you are right now.
+          </p>
+          <button type="button" onClick={nearest.locate} className="pill-btn">
+            Use my location
+            <span className="knob">
+              <IconArrowUpRight size={17} stroke={1.75} />
+            </span>
+          </button>
+          {nearest.status === 'error' && <p className="mt-3 text-[12px] text-destructive">{nearest.errorMessage}</p>}
+        </>
+      )}
+    </Bezel>
+  );
+}
+
+function BoardLink({ to }: { to: string }) {
+  return (
+    <Link
+      to={to}
+      className="press inline-flex h-9 shrink-0 items-center gap-1 rounded-full bg-white/8 pr-1.5 pl-3.5 text-[13px] font-bold hover:bg-white/12"
+    >
+      Board
+      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10">
+        <IconArrowUpRight size={14} stroke={1.75} />
+      </span>
+    </Link>
+  );
+}
+
+function SectionHeading({ title, aside }: { title: string; aside?: React.ReactNode }) {
+  return (
+    <div className="mb-3.5 flex items-center justify-between px-1.5">
+      <h2 className="font-display text-[22px] font-medium tracking-[-0.03em]">{title}</h2>
+      {aside && <span className="text-[13px] text-muted-foreground">{aside}</span>}
     </div>
   );
 }

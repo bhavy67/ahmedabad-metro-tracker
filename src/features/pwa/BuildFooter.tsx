@@ -23,7 +23,7 @@ export function BuildFooter() {
   }
 
   return (
-    <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 pt-4 pb-2">
+    <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-1.5 pt-5 pb-2">
       <p className="tnum font-mono text-[11px] leading-relaxed text-muted-foreground">
         v{APP_VERSION} · build {BUILD_ID} · cache v{CACHE_EPOCH}
         <br />
@@ -33,9 +33,9 @@ export function BuildFooter() {
         type="button"
         onClick={clear}
         disabled={clearing}
-        className="press flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-[12px] font-medium text-muted-foreground hover:bg-accent disabled:opacity-60"
+        className="press surface surface-hover flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[12px] font-bold text-muted-foreground hover:text-foreground disabled:opacity-60"
       >
-        {clearing ? <IconLoader2 size={13} className="animate-spin" /> : <IconTrash size={13} />}
+        {clearing ? <IconLoader2 size={14} className="animate-spin" /> : <IconTrash size={14} stroke={1.75} />}
         {clearing ? 'Clearing…' : 'Clear cache & reload'}
       </button>
     </footer>

@@ -10,6 +10,7 @@ import { getStation } from '@/src/lib/metro/network.ts';
 import { CURATED_PLACES, CATEGORY_LABELS, CATEGORY_ORDER, type CuratedPlace, type ResolvedPlace } from '@/src/lib/metro/places.ts';
 import { useNominatim, type NominatimResult } from '@/src/hooks/useNominatim.ts';
 import type { NetworkStation } from '@/src/lib/metro/types.ts';
+import { Bezel } from '@/components/Bezel.tsx';
 
 // Pre-computed once at module load — curated places are static so no need to
 // call nearestStation() on every tap.
@@ -32,11 +33,19 @@ function mapsDirectionsUrl(lat: number, lng: number, label: string): string {
 }
 
 const CATEGORY_ICON: Record<CuratedPlace['category'], React.ReactNode> = {
-  transport: <IconTrain size={14} stroke={2} />,
-  mall: <IconBuildingStore size={14} stroke={2} />,
-  hospital: <IconHeartPlus size={14} stroke={2} />,
-  education: <IconSchool size={14} stroke={2} />,
-  attraction: <IconStars size={14} stroke={2} />,
+  transport: <IconTrain size={16} stroke={1.75} />,
+  mall: <IconBuildingStore size={16} stroke={1.75} />,
+  hospital: <IconHeartPlus size={16} stroke={1.75} />,
+  education: <IconSchool size={16} stroke={1.75} />,
+  attraction: <IconStars size={16} stroke={1.75} />,
+};
+
+const CATEGORY_TONE: Record<CuratedPlace['category'], string> = {
+  transport: 'var(--line-violet)',
+  mall: 'var(--line-yellow)',
+  hospital: 'var(--line-red)',
+  education: 'var(--line-blue)',
+  attraction: 'var(--live)',
 };
 
 export function PlacesPage() {
@@ -71,32 +80,42 @@ export function PlacesPage() {
   const showDropdown = query.trim().length > 0 && (status === 'loading' || nominatimResults.length > 0);
 
   return (
-    <div className="pb-8">
-      <div className="border-b border-border bg-card px-4 pb-5 pt-4">
-        <h1 className="mb-4 font-display text-[22px] font-semibold tracking-tight">Find nearest station</h1>
+    <div className="mx-auto grid w-full max-w-[1240px] gap-3.5 px-3.5 md:px-7 lg:grid-cols-12 lg:items-start">
+      <div className="flex flex-col gap-3.5 lg:sticky lg:top-0 lg:col-span-5">
+        <header className="rise px-1.5 pb-2">
+          <span className="eyebrow">
+            <IconMapPin size={11} /> Places
+          </span>
+          <h1 className="mt-4 font-display text-[clamp(2rem,7.6vw,3rem)] leading-[1.02] font-medium tracking-[-0.045em]">
+            Go <span className="glow-text">somewhere.</span>
+          </h1>
+          <p className="mt-3 max-w-[38ch] text-[15px] text-muted-foreground">
+            Search any place in Ahmedabad and we'll find the closest metro station.
+          </p>
+        </header>
 
-        {/* Search bar */}
-        <div className="relative">
-          <IconSearch size={17} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        {/* Search bar — relative + z-20 so the suggestions float over the cards below. */}
+        <div className="rise relative z-20" style={{ '--i': 1 } as React.CSSProperties}>
+          <IconSearch size={18} stroke={1.75} className="pointer-events-none absolute top-1/2 left-5 -translate-y-1/2 text-muted-foreground" />
           <input
             value={query}
             onChange={e => handleQueryChange(e.target.value)}
             placeholder="Search any place in Ahmedabad…"
-            className="h-12 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-[15px] outline-none focus:border-ring focus:ring-2 focus:ring-ring/20"
+            className="surface h-14 w-full rounded-full pr-12 pl-12 text-[15px] font-medium outline-none transition-colors focus:border-primary/60 focus:bg-primary/6"
           />
           {query && (
             <button
               type="button"
               onClick={() => { setQuery(''); clear(); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label="Clear search"
+              className="absolute top-1/2 right-3 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground hover:bg-white/8 hover:text-foreground"
             >
               <IconX size={16} />
             </button>
           )}
 
-          {/* Nominatim dropdown */}
           {showDropdown && (
-            <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-10 overflow-hidden rounded-xl border border-border bg-card shadow-lg">
+            <div className="row-fade-in absolute top-[calc(100%+8px)] right-0 left-0 overflow-hidden rounded-[24px] border border-border-strong bg-popover p-1.5 shadow-2xl">
               {status === 'loading' && (
                 <div className="flex items-center gap-2 px-4 py-3 text-[13px] text-muted-foreground">
                   <IconLoader2 size={14} className="animate-spin" /> Searching…
@@ -107,13 +126,11 @@ export function PlacesPage() {
                   key={item.place_id}
                   type="button"
                   onClick={() => handleNominatimPick(item)}
-                  className="press flex w-full items-start gap-3 border-t border-border px-4 py-3 text-left first:border-t-0"
+                  className="press flex w-full items-start gap-3 rounded-[18px] px-3.5 py-3 text-left hover:bg-white/5"
                 >
-                  <IconMapPin size={15} className="mt-0.5 shrink-0 text-muted-foreground" />
+                  <IconMapPin size={16} stroke={1.75} className="mt-0.5 shrink-0 text-muted-foreground" />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[14px] font-semibold text-foreground line-clamp-1">
-                      {item.display_name.split(',')[0]}
-                    </span>
+                    <span className="line-clamp-1 block text-[14px] font-bold">{item.display_name.split(',')[0]}</span>
                     <span className="block truncate text-[12px] text-muted-foreground">
                       {item.display_name.split(',').slice(1, 3).join(',')}
                     </span>
@@ -126,66 +143,67 @@ export function PlacesPage() {
             </div>
           )}
         </div>
+
+        {result && (
+          <Bezel key={result.name} className="rise">
+            <p className="text-[10px] font-bold tracking-[0.16em] text-muted-foreground uppercase">Nearest station to</p>
+            <p className="mt-1 font-display text-[17px] font-medium tracking-tight">{result.name}</p>
+
+            <div className="surface mt-4 flex items-center gap-3 rounded-[20px] p-3.5">
+              <span className="flex gap-1">
+                {result.station.lines.map(line => (
+                  <span
+                    key={line}
+                    className="h-9 w-2 rounded-full"
+                    style={{ backgroundColor: `var(--line-${line})`, boxShadow: `0 0 14px var(--line-${line})` }}
+                  />
+                ))}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-display text-[19px] font-medium tracking-tight">{result.station.name}</p>
+                <p className="tnum mt-0.5 font-mono text-[12px] text-muted-foreground">
+                  {(result.distanceMeters / 1000).toFixed(1)} km · ~{walkingMinutes(result.distanceMeters)} min walk
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link to={`/station/${result.station.id}`} className="pill-btn">
+                Departures
+                <span className="knob">
+                  <IconChevronRight size={17} stroke={1.75} />
+                </span>
+              </Link>
+              <a
+                href={mapsDirectionsUrl(result.station.lat, result.station.lng, result.station.name)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pill-btn ghost"
+              >
+                Walk there
+                <span className="knob">
+                  <IconRoute size={16} stroke={1.75} />
+                </span>
+              </a>
+            </div>
+          </Bezel>
+        )}
       </div>
 
-      <div className="space-y-6 px-4 pt-5">
-        {/* Result card */}
-        {result && (
-          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-            <div className="bg-primary/8 px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Nearest station to</p>
-              <p className="mt-0.5 font-display text-[16px] font-semibold text-foreground">{result.name}</p>
-            </div>
-            <div className="flex items-center gap-3 px-4 py-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
-                <IconTrain size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-display text-[17px] font-semibold">{result.station.name}</p>
-                <div className="mt-0.5 flex items-center gap-2 text-[12px] text-muted-foreground">
-                  <span>{(result.distanceMeters / 1000).toFixed(1)} km away</span>
-                  <span>·</span>
-                  <span>~{walkingMinutes(result.distanceMeters)} min walk</span>
-                </div>
-                <div className="mt-1 flex gap-1">
-                  {result.station.lines.map(line => (
-                    <span
-                      key={line}
-                      className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
-                      style={{ backgroundColor: `var(--line-${line})`, color: `var(--line-${line}-ink)` }}
-                    >
-                      {line}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="flex shrink-0 flex-col gap-2">
-                <Link
-                  to={`/station/${result.station.id}`}
-                  className="press flex h-9 items-center justify-center gap-1.5 rounded-xl bg-accent px-3.5 text-[13px] font-medium text-foreground"
-                >
-                  Board <IconChevronRight size={14} />
-                </Link>
-                <a
-                  href={mapsDirectionsUrl(result.station.lat, result.station.lng, result.station.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="press flex h-9 items-center justify-center gap-1.5 rounded-xl bg-primary/10 px-3.5 text-[13px] font-medium text-primary"
-                >
-                  <IconRoute size={14} /> Directions
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Curated places by category */}
-        {CATEGORY_ORDER.map(category => {
+      {/* Curated places by category */}
+      <div className="flex flex-col gap-3.5 lg:col-span-7">
+        {CATEGORY_ORDER.map((category, i) => {
           const places = RESOLVED_PLACES.filter(p => p.category === category);
+          const tone = CATEGORY_TONE[category];
           return (
-            <div key={category}>
-              <h2 className="mb-2 flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground">
-                {CATEGORY_ICON[category]}
+            <Bezel key={category} className="rise" style={{ '--i': i + 2 } as React.CSSProperties}>
+              <h2 className="mb-3.5 flex items-center gap-2.5 font-display text-[17px] font-medium tracking-tight">
+                <span
+                  className="flex h-8 w-8 items-center justify-center rounded-full"
+                  style={{ color: tone, backgroundColor: `color-mix(in srgb, ${tone} 15%, transparent)` }}
+                >
+                  {CATEGORY_ICON[category]}
+                </span>
                 {CATEGORY_LABELS[category]}
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -194,13 +212,13 @@ export function PlacesPage() {
                     key={place.id}
                     type="button"
                     onClick={() => handleCuratedPick(place)}
-                    className="press rounded-full border border-border bg-card px-3 py-1.5 text-[13px] font-medium text-foreground hover:bg-accent"
+                    className="press surface surface-hover rounded-full px-3.5 py-2 text-[13px] font-semibold"
                   >
                     {place.name}
                   </button>
                 ))}
               </div>
-            </div>
+            </Bezel>
           );
         })}
       </div>

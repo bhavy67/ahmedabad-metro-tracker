@@ -1,7 +1,6 @@
 import { IconBroadcast, IconClockHour4, IconAlertTriangle, type Icon as TablerIcon } from '@tabler/icons-react';
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose } from '@/components/ui/drawer';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function LiveBadge() {
@@ -10,13 +9,10 @@ export function LiveBadge() {
       <Tooltip>
         <TooltipTrigger
           render={
-            <DrawerTrigger className="press inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-semibold text-foreground shadow-sm hover:bg-accent" />
+            <DrawerTrigger className="press inline-flex h-9 items-center gap-2 rounded-full bg-white/6 px-3.5 text-[12px] font-bold hover:bg-white/10" />
           }
         >
-          <span className="relative inline-flex h-2 w-2">
-            <span className="signal-ping absolute inset-0 text-primary" />
-            <span className="relative inline-block h-2 w-2 rounded-full bg-primary" />
-          </span>
+          <span className="live-dot" />
           <span>Live</span>
         </TooltipTrigger>
         <TooltipContent side="bottom">About live data</TooltipContent>
@@ -24,13 +20,14 @@ export function LiveBadge() {
 
       <DrawerContent>
         <div className="px-5 pt-4">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/12 text-primary">
-            <IconBroadcast size={26} stroke={2} />
+          <div
+            className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-live/12 text-live"
+            style={{ boxShadow: '0 0 40px -6px var(--live)' }}
+          >
+            <IconBroadcast size={26} stroke={1.5} />
           </div>
-          <DrawerHeader className="items-center px-0 text-center">
-            <DrawerTitle className="font-display text-[22px] font-semibold tracking-tight">
-              About live data
-            </DrawerTitle>
+          <DrawerHeader className="items-center px-0 text-center md:text-center">
+            <DrawerTitle className="text-[20px]">About live data</DrawerTitle>
             <DrawerDescription className="text-[14px] leading-relaxed">
               Ahmedabad Metro doesn't publish a real-time train feed. Positions and countdowns
               are computed from the official GMRC timetable against the current time.
@@ -54,7 +51,7 @@ export function LiveBadge() {
         </div>
 
         <DrawerFooter className="pt-5">
-          <DrawerClose render={<Button className="h-12 w-full text-[14px] font-semibold">Got it</Button>} />
+          <DrawerClose className="pill-btn w-full justify-center px-5">Got it</DrawerClose>
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -73,17 +70,17 @@ function InfoRow({
   tone?: 'info' | 'warning';
 }) {
   return (
-    <div className="flex gap-3 rounded-xl border border-border bg-card px-3.5 py-3">
+    <div className="surface flex gap-3 rounded-[20px] px-3.5 py-3">
       <span
         className={cn(
-          'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
-          tone === 'info' ? 'bg-primary/12 text-primary' : 'bg-destructive/12 text-destructive'
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+          tone === 'info' ? 'bg-primary/14 text-primary' : 'bg-destructive/14 text-destructive'
         )}
       >
-        <Icon size={18} stroke={2} />
+        <Icon size={18} stroke={1.75} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-[14px] font-semibold text-foreground">{title}</p>
+        <p className="text-[14px] font-bold text-foreground">{title}</p>
         <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">{body}</p>
       </div>
     </div>
