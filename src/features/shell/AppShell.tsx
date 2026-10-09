@@ -42,7 +42,9 @@ export function AppShell() {
           'page-enter relative z-10 h-full overflow-x-hidden overscroll-contain',
           fullBleed
             ? 'overflow-hidden'
-            : 'overflow-y-auto pt-[calc(max(14px,env(safe-area-inset-top))+76px)] pb-[calc(env(safe-area-inset-bottom)+112px)] md:pt-[104px] md:pb-16'
+            : 'overflow-y-auto pt-[calc(max(14px,env(safe-area-inset-top))+76px)] pb-[calc(env(safe-area-inset-bottom)+112px)] md:pt-[104px] md:pb-16',
+          // The mobile menu covers the page; don't let it scroll underneath.
+          menuOpen && 'max-md:overflow-hidden'
         )}
       >
         <Outlet />

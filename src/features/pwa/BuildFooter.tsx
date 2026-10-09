@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { IconTrash, IconLoader2 } from '@tabler/icons-react';
 import { APP_VERSION, BUILD_ID, BUILD_TIME, CACHE_EPOCH, hardReset } from '@/src/lib/pwa/cacheBust.ts';
+import { timetableInfo } from '@/src/lib/metro/network.ts';
 
 function buildDate(): string {
   const d = new Date(BUILD_TIME);
@@ -27,7 +28,8 @@ export function BuildFooter() {
       <p className="tnum font-mono text-[11px] leading-relaxed text-muted-foreground">
         v{APP_VERSION} · build {BUILD_ID} · cache v{CACHE_EPOCH}
         <br />
-        {buildDate()}
+        {buildDate()} · timetable {timetableInfo.effective}
+        {timetableInfo.verified ? '' : ' (unverified)'}
       </p>
       <button
         type="button"

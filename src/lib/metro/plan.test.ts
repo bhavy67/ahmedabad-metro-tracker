@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { planJourney, type PlanSource } from './plan.ts';
+import { planJourney, planJourneyArriveBy, type PlanSource } from './plan.ts';
 import type { Pattern, Trip } from './types.ts';
 
 // Stations: A(0) B(1) C(2) D(3) E(4). Line X: A-B-C. Line Y: C-D-E. Interchange at C.
@@ -96,5 +96,47 @@ describe('planJourney: rolls over to tomorrow when nothing runs today', () => {
     const plan = planJourney('A', 'C', 500, 3, { source: source(trips, [lineX]) });
     expect(plan).not.toBeNull();
     expect(plan!.isTomorrow).toBe(true);
+  });
+});
+
+describe('planJourneyArriveBy (reverse CSA)', () => {
+  it('picks the latest departure that still arrives in time', () => {
+    const trips: Trip[] = [
+      { p: 0, days: ALL_DAYS, t: 1000 }, // arrives C @ 1200
+      { p: 0, days: ALL_DAYS, t: 2000 }, // arrives C @ 2200
+    ];
+    const early = planJourneyArriveBy('A', 'C', 2100, 3, { source: source(trips, [lineX]) });
+    expect(early!.departSeconds).toBe(1000);
+    expect(early!.arriveSeconds).toBe(1200);
+    const exact = planJourneyArriveBy('A', 'C', 2200, 3, { source: source(trips, [lineX]) });
+    expect(exact!.departSeconds).toBe(2000);
+    expect(exact!.isTomorrow).toBe(false);
+  });
+
+  it('never chains a connection inside the transfer buffer', () => {
+    const trips: Trip[] = [
+      { p: 0, days: ALL_DAYS, t: 1000 }, // lineX arrives C @ 1200
+      { p: 1, days: ALL_DAYS, t: 1210 }, // lineY leaves C 10s later — too tight
+      { p: 1, days: ALL_DAYS, t: 1400 }, // lineY leaves C @ 1400, arrives E @ 1600
+    ];
+    const plan = planJourneyArriveBy('A', 'E', 1700, 3, { source: source(trips, [lineX, lineY]) });
+    expect(plan!.legs).toHaveLength(2);
+    expect(plan!.legs[1].departSeconds).toBe(1400);
+    expect(plan!.arriveSeconds).toBe(1600);
+  });
+
+  it('falls back to the next day when nothing reaches the destination in time today', () => {
+    const thursdayOnly = 1 << 4;
+    const trips: Trip[] = [{ p: 0, days: thursdayOnly, t: 1000 }];
+    const plan = planJourneyArriveBy('A', 'C', 1300, 3, { source: source(trips, [lineX]) });
+    expect(plan).not.toBeNull();
+    expect(plan!.isTomorrow).toBe(true);
+    expect(plan!.departSeconds).toBe(1000);
+  });
+
+  it('returns null for identical stations or when nothing ever arrives in time', () => {
+    const trips: Trip[] = [{ p: 0, days: ALL_DAYS, t: 1000 }];
+    expect(planJourneyArriveBy('A', 'A', 5000, 3, { source: source(trips, [lineX]) })).toBeNull();
+    expect(planJourneyArriveBy('A', 'C', 500, 3, { source: source(trips, [lineX]) })).toBeNull();
   });
 });

@@ -1,4 +1,5 @@
-import { IconBroadcast, IconClockHour4, IconAlertTriangle, type Icon as TablerIcon } from '@tabler/icons-react';
+import { IconBroadcast, IconClockHour4, IconAlertTriangle, IconCalendarEvent, type Icon as TablerIcon } from '@tabler/icons-react';
+import { timetableInfo } from '@/src/lib/metro/network.ts';
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose } from '@/components/ui/drawer';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -47,6 +48,16 @@ export function LiveBadge() {
             tone="warning"
             title="Can't detect delays"
             body="If a train is running late or a service is disrupted, this app has no way to know."
+          />
+          <InfoRow
+            icon={IconCalendarEvent}
+            tone={timetableInfo.verified ? 'info' : 'warning'}
+            title={`Timetable effective ${timetableInfo.effective}`}
+            body={
+              timetableInfo.verified
+                ? 'Matches the official GMRC timetable for this date.'
+                : "Not yet checked against GMRC's official timetable, so some timings may differ slightly."
+            }
           />
         </div>
 

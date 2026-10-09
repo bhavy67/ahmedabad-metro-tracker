@@ -60,3 +60,18 @@ export function segmentBetween(a: string, b: string): { coords: [number, number]
   if (!sa || !sb) throw new Error(`segmentBetween: unknown stations ${a} / ${b}`);
   return { coords: [[sa.lat, sa.lng], [sb.lat, sb.lng]], cumMeters: [0, 0], totalMeters: 0, reliable: false };
 }
+
+/**
+ * The timetable's effective date for display, and whether it has been checked
+ * against GMRC's source workbook (build-network.ts marks it "unverified" until then).
+ */
+export const timetableInfo = (() => {
+  const raw = timetable.sourceEffective;
+  const date = new Date(`${raw.slice(0, 10)}T00:00:00+05:30`);
+  return {
+    effective: Number.isNaN(date.getTime())
+      ? raw
+      : date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' }),
+    verified: !/unverified/i.test(raw),
+  };
+})();

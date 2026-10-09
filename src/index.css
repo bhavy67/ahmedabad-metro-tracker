@@ -470,3 +470,11 @@
   font-weight: 500;
   color: var(--muted-foreground);
 }
+
+/* Line page entrance — the track draws down, stations pop in along it. */
+@keyframes line-track-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.line-track-grow { animation: line-track-grow 600ms var(--spring) both; }
+@keyframes line-dot-pop { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+.line-dot-pop { animation: line-dot-pop 380ms var(--spring) both; }
+@keyframes line-node-in { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+.line-node-in { animation: line-node-in 380ms var(--spring) both; }

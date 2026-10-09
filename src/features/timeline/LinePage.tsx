@@ -1,12 +1,10 @@
 import { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router';
-import { animate, stagger } from 'animejs';
 import { IconClock, IconChevronDown, IconArrowsExchange } from '@tabler/icons-react';
 import { Bezel } from '@/components/Bezel.tsx';
 import { BackButton } from '@/src/features/shell/BackButton.tsx';
 import { network, requireStation } from '@/src/lib/metro/network.ts';
 import { useLiveTrains } from '@/src/hooks/useLiveTrains.ts';
-import { useAnimeScope } from '@/src/hooks/useAnimeScope.ts';
 import { formatScheduleTime12 } from '@/src/lib/metro/clock.ts';
 import type { LineId, TrainRun } from '@/src/lib/metro/types.ts';
 
@@ -30,33 +28,6 @@ export function LinePage() {
     return trains.filter(t => stationSet.has(t.fromStationId) && stationSet.has(t.toStationId));
   }, [trains, stationOrder]);
 
-  const listRef = useAnimeScope<HTMLDivElement>(
-    root => {
-      animate(root.querySelectorAll('[data-line-node]'), {
-        opacity: [0, 1],
-        translateX: [-10, 0],
-        delay: stagger(24),
-        duration: 380,
-        ease: 'outQuad',
-      });
-      animate(root.querySelectorAll('[data-line-dot]'), {
-        opacity: [0, 1],
-        scale: [0, 1],
-        delay: stagger(24),
-        duration: 380,
-        ease: 'outQuad',
-      });
-      const track = root.querySelector('[data-line-track]');
-      if (track) {
-        animate(track, {
-          scaleY: [0, 1],
-          duration: Math.min(800, stationOrder.length * 40),
-          ease: 'outQuad',
-        });
-      }
-    },
-    [line]
-  );
 
   if (!valid) return <Navigate to="/" replace />;
 
@@ -94,17 +65,17 @@ export function LinePage() {
       </header>
 
       <Bezel className="rise lg:col-span-7" coreClassName="p-2 md:p-3" style={{ '--i': 1 } as React.CSSProperties}>
-        <div ref={listRef} className="relative px-2 pt-5 pb-5">
+        <div className="relative px-2 pt-5 pb-5">
           {/* The track spans from the vertical center of the first station dot to the
               vertical center of the last — not from the container's top edge — so it
               terminates exactly at both end dots rather than overshooting or falling short. */}
           <div
-            data-line-track
-            className="absolute w-[3px] origin-top -translate-x-1/2 rounded-full"
+            className="line-track-grow absolute w-[3px] origin-top -translate-x-1/2 rounded-full"
             style={{
               left: RAIL_LEFT,
               top: 20 + ROW_HEIGHT / 2,
               height: (stationOrder.length - 1) * ROW_HEIGHT,
+              animationDuration: `${Math.min(800, stationOrder.length * 40)}ms`,
               backgroundColor: `var(--line-${line})`,
               boxShadow: `0 0 12px var(--line-${line})`,
               opacity: 0.55,
@@ -116,8 +87,7 @@ export function LinePage() {
             return (
               <span
                 key={stationId}
-                data-line-dot
-                className="absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px]"
+                className="line-dot-pop absolute z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px]"
                 style={{
                   left: RAIL_LEFT,
                   top: 20 + idx * ROW_HEIGHT + ROW_HEIGHT / 2,
@@ -125,6 +95,7 @@ export function LinePage() {
                   height: station.isInterchange ? 16 : 12,
                   borderColor: station.isInterchange ? 'var(--foreground)' : `var(--line-${line})`,
                   backgroundColor: '#0E0E14',
+                  animationDelay: `${idx * 24}ms`,
                 }}
               />
             );
@@ -135,10 +106,14 @@ export function LinePage() {
           ))}
 
           <ul className="m-0 list-none p-0">
-            {stationOrder.map(stationId => {
+            {stationOrder.map((stationId, idx) => {
               const station = requireStation(stationId);
               return (
-                <li key={stationId} data-line-node style={{ height: ROW_HEIGHT }} className="relative">
+                <li
+                  key={stationId}
+                  style={{ height: ROW_HEIGHT, animationDelay: `${idx * 24}ms` }}
+                  className="line-node-in relative"
+                >
                   <Link
                     to={`/station/${stationId}`}
                     className="press flex h-full flex-col justify-center rounded-[18px] pr-3 hover:bg-white/4"
