@@ -1,0 +1,13 @@
+# Signing material — NEVER commit. Back the keystore + passwords up somewhere safe.
+*.keystore
+*.jks
+keystore.properties
+
+# Build output
+.gradle/
+build/
+app/build/
+local.properties
+*.apk
+*.aab
+*.idsig

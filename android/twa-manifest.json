@@ -1,0 +1,64 @@
+{
+  "packageId": "in.bhavyladani.metro",
+  "host": "metro.bhavyladani.in",
+  "name": "MetroNow — Ahmedabad Metro",
+  "launcherName": "MetroNow",
+  "display": "standalone",
+  "themeColor": "#050507",
+  "themeColorDark": "#050507",
+  "navigationColor": "#050507",
+  "navigationColorDark": "#050507",
+  "navigationDividerColor": "#050507",
+  "navigationDividerColorDark": "#050507",
+  "backgroundColor": "#050507",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://metro.bhavyladani.in/pwa-512x512.png",
+  "maskableIconUrl": "https://metro.bhavyladani.in/pwa-maskable-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "metronow"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Plan a journey",
+      "shortName": "Plan",
+      "url": "https://metro.bhavyladani.in/plan",
+      "chosenIconUrl": "https://metro.bhavyladani.in/pwa-192x192.png"
+    },
+    {
+      "name": "Live map",
+      "shortName": "Live Map",
+      "url": "https://metro.bhavyladani.in/map",
+      "chosenIconUrl": "https://metro.bhavyladani.in/pwa-192x192.png"
+    }
+  ],
+  "generatorApp": "unknown",
+  "webManifestUrl": "https://metro.bhavyladani.in/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://metro.bhavyladani.in/",
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "1.0.0"
+}
