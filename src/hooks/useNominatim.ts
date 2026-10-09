@@ -9,7 +9,7 @@ export interface NominatimResult {
 
 interface State {
   results: NominatimResult[];
-  status: 'idle' | 'loading' | 'done' | 'error';
+  status: 'idle' | 'loading' | 'done' | 'error' | 'offline';
 }
 
 // Rough bounding box around Ahmedabad to bias results locally
@@ -28,6 +28,11 @@ export function useNominatim() {
     }
 
     debounceRef.current = setTimeout(async () => {
+      // Search is the one online-only feature; say so instead of failing quietly.
+      if (!navigator.onLine) {
+        setState({ results: [], status: 'offline' });
+        return;
+      }
       abortRef.current?.abort();
       abortRef.current = new AbortController();
 
@@ -45,6 +50,8 @@ export function useNominatim() {
           headers: { 'Accept-Language': 'en', 'User-Agent': 'AhmedabadMetroTracker/1.0' },
           signal: abortRef.current.signal,
         });
+        // Nominatim rate-limits (429) and has outages; treat any non-2xx as an error.
+        if (!res.ok) throw new Error(`Nominatim ${res.status}`);
         const data: NominatimResult[] = await res.json();
         setState({ results: data, status: 'done' });
       } catch (err) {

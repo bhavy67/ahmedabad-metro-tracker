@@ -203,6 +203,13 @@
   button:not(:disabled), [role="button"]:not(:disabled), a {
     cursor: pointer;
   }
+  /* Keyboard focus must be obvious on black. Only :focus-visible, so mouse
+     and touch users never see it; text inputs opt out via outline-none and
+     show their own focused border instead. */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
   ::selection {
     background: color-mix(in srgb, var(--primary) 45%, transparent);
   }

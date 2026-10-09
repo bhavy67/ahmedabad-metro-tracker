@@ -7,7 +7,7 @@ import {
 import { StationPicker } from './StationPicker.tsx';
 import { useMetroClock } from '@/src/hooks/useMetroClock.ts';
 import { planJourney, planJourneyArriveBy } from '@/src/lib/metro/plan.ts';
-import { requireStation, getStation } from '@/src/lib/metro/network.ts';
+import { requireStation, getStation, network } from '@/src/lib/metro/network.ts';
 import { formatClockShort12 } from '@/src/lib/metro/clock.ts';
 import type { NetworkStation } from '@/src/lib/metro/types.ts';
 import { Bezel } from '@/components/Bezel.tsx';
@@ -23,33 +23,55 @@ function secondsToHHMM(s: number): string {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/** Waits at or above this get called out — the Violet line, for one, has a midday gap of several hours. */
+const LONG_WAIT_SECONDS = 20 * 60;
+
+function formatWait(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds / 60));
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  return h > 0 ? `${h} h${m ? ` ${m} min` : ''}` : `${m} min`;
+}
+
 function parseHHMM(hhmm: string): number {
   const [h, m] = hhmm.split(':').map(Number);
   return (h ?? 0) * 3600 + (m ?? 0) * 60;
 }
 
 export function PlanPage() {
-  const [origin, setOrigin] = useState<NetworkStation | null>(null);
-  const [destination, setDestination] = useState<NetworkStation | null>(null);
-  const [mode, setMode] = useState<PlanMode>('depart');
+  // The journey lives in the URL (?from=&to=&by=HH:MM) so refresh, back/forward
+  // and shared links all restore it. State is seeded from the URL once, then
+  // mirrored back into it below.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [origin, setOrigin] = useState<NetworkStation | null>(() => getStation(searchParams.get('from') ?? '') ?? null);
+  const [destination, setDestination] = useState<NetworkStation | null>(() => getStation(searchParams.get('to') ?? '') ?? null);
+  const urlArriveBy = searchParams.get('by');
+  const [mode, setMode] = useState<PlanMode>(() => (urlArriveBy && HHMM.test(urlArriveBy) ? 'arrive' : 'depart'));
   const { secondsOfDay, dayOfWeek } = useMetroClock();
 
   // Default arrive-by time: current time + 30 min, initialised lazily so it
   // doesn't stale the moment the user switches tabs.
   const [arriveByTime, setArriveByTime] = useState<string>(() =>
-    secondsToHHMM(secondsOfDay + 30 * 60)
+    urlArriveBy && HHMM.test(urlArriveBy) ? urlArriveBy : secondsToHHMM(secondsOfDay + 30 * 60)
   );
 
   const { recents, add: addRecent } = useRecentJourneys();
-  const [searchParams] = useSearchParams();
 
-  // Pre-fill pickers from shared URL (?from=id&to=id)
   useEffect(() => {
-    const fromId = searchParams.get('from');
-    const toId = searchParams.get('to');
-    if (fromId) { const s = getStation(fromId); if (s) setOrigin(s); }
-    if (toId)   { const s = getStation(toId);   if (s) setDestination(s); }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    setSearchParams(
+      prev => {
+        const next = new URLSearchParams(prev);
+        const put = (key: string, value: string | null) => (value ? next.set(key, value) : next.delete(key));
+        put('from', origin?.id ?? null);
+        put('to', destination?.id ?? null);
+        put('by', mode === 'arrive' ? arriveByTime : null);
+        return next;
+      },
+      { replace: true }
+    );
+  }, [origin?.id, destination?.id, mode, arriveByTime, setSearchParams]);
 
   // Save to recents whenever a complete pair is selected
   useEffect(() => {
@@ -179,7 +201,7 @@ export function PlanPage() {
         ) : !plan ? (
           <EmptyState title="No route found" body="No route is available between these stations right now." />
         ) : (
-          <JourneyResult plan={plan} mode={mode} />
+          <JourneyResult plan={plan} mode={mode} nowSeconds={secondsOfDay} />
         )}
       </div>
     </div>
@@ -217,11 +239,40 @@ function EmptyState({ title, body }: { title: string; body: string }) {
   );
 }
 
-function JourneyResult({ plan, mode }: { plan: NonNullable<ReturnType<typeof planJourney>>; mode: PlanMode }) {
+function JourneyResult({
+  plan,
+  mode,
+  nowSeconds,
+}: {
+  plan: NonNullable<ReturnType<typeof planJourney>>;
+  mode: PlanMode;
+  nowSeconds: number;
+}) {
   const [copied, setCopied] = useState(false);
 
+  // Time spent standing on a platform: before the first train (depart-now only)
+  // and at each change. Long ones are surfaced instead of hiding inside a big
+  // total duration.
+  const firstWait = mode === 'depart' && !plan.isTomorrow ? plan.departSeconds - nowSeconds : 0;
+  const changeWaits = plan.legs.map((leg, i) => (i === 0 ? 0 : leg.departSeconds - plan.legs[i - 1].arriveSeconds));
+  const longWaits: string[] = [];
+  if (firstWait >= LONG_WAIT_SECONDS) {
+    longWaits.push(
+      `The next train from ${requireStation(plan.originStationId).name} leaves at ${formatClockShort12(plan.departSeconds)} — a ${formatWait(firstWait)} wait.`
+    );
+  }
+  plan.legs.forEach((leg, i) => {
+    if (changeWaits[i] >= LONG_WAIT_SECONDS) {
+      longWaits.push(
+        `Long wait at ${requireStation(leg.boardStationId).name}: the next ${network.lines[leg.line].name} train leaves at ${formatClockShort12(leg.departSeconds)} — ${formatWait(changeWaits[i])}.`
+      );
+    }
+  });
+
   async function handleShare() {
-    const url = `${window.location.origin}/plan?from=${plan.originStationId}&to=${plan.destinationStationId}`;
+    const params = new URLSearchParams({ from: plan.originStationId, to: plan.destinationStationId });
+    if (mode === 'arrive') params.set('by', secondsToHHMM(plan.arriveSeconds));
+    const url = `${window.location.origin}/plan?${params}`;
     if (navigator.share) {
       try { await navigator.share({ title: 'Ahmedabad Metro journey', url }); } catch { /* cancelled */ }
     } else {
@@ -246,6 +297,12 @@ function JourneyResult({ plan, mode }: { plan: NonNullable<ReturnType<typeof pla
             : 'No more trains today — this is the first departure tomorrow morning.'}
         </p>
       )}
+
+      {longWaits.map(text => (
+        <p key={text} className="row-fade-in rounded-[20px] border border-line-yellow/30 bg-line-yellow/8 px-4 py-3 text-[13px] font-semibold">
+          {text}
+        </p>
+      ))}
 
       <Bezel className="rise" coreClassName="p-0 md:p-0" style={{ '--i': 3 } as React.CSSProperties}>
         <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
@@ -275,6 +332,9 @@ function JourneyResult({ plan, mode }: { plan: NonNullable<ReturnType<typeof pla
                 {i > 0 && (
                   <div className="surface mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold text-muted-foreground">
                     <IconArrowsExchange size={13} stroke={1.75} /> Change at {board.name}
+                    <span className={changeWaits[i] >= LONG_WAIT_SECONDS ? 'text-line-yellow' : ''}>
+                      · {formatWait(changeWaits[i])} wait
+                    </span>
                   </div>
                 )}
                 <div className="flex gap-3.5">

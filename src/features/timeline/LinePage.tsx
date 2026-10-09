@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router';
 import { animate, stagger } from 'animejs';
-import { IconClock, IconChevronDown, IconArrowsExchange, IconArrowLeft } from '@tabler/icons-react';
+import { IconClock, IconChevronDown, IconArrowsExchange } from '@tabler/icons-react';
 import { Bezel } from '@/components/Bezel.tsx';
+import { BackButton } from '@/src/features/shell/BackButton.tsx';
 import { network, requireStation } from '@/src/lib/metro/network.ts';
 import { useLiveTrains } from '@/src/hooks/useLiveTrains.ts';
 import { useAnimeScope } from '@/src/hooks/useAnimeScope.ts';
@@ -68,13 +69,7 @@ export function LinePage() {
           className="pointer-events-none absolute -top-28 -left-16 h-80 w-80 rounded-full opacity-35 blur-[90px]"
           style={{ backgroundColor: `var(--line-${line})` }}
         />
-        <Link
-          to="/"
-          aria-label="Back to home"
-          className="press surface surface-hover relative mb-6 flex h-10 w-10 items-center justify-center rounded-full"
-        >
-          <IconArrowLeft size={18} stroke={1.75} />
-        </Link>
+        <BackButton className="relative mb-6" />
         <p className="relative inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] uppercase">
           <span
             className="h-2 w-2 rounded-full"

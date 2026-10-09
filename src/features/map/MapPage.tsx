@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Map as MaplibreMap, Marker, NavigationControl, AttributionControl } from 'maplibre-gl';
+import { Map as MaplibreMap, Marker, NavigationControl, AttributionControl, setWorkerUrl } from 'maplibre-gl';
+// MapLibre 6 loads its tile worker as a separate module that the production
+// build would otherwise never emit (the request falls through to index.html and
+// the map never finishes loading). Bundle it as a real worker and point at it.
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { IconFocusCentered } from '@tabler/icons-react';
 import { buildLineFeatures, networkBounds } from '@/src/lib/metro/mapData.ts';
@@ -25,6 +29,8 @@ import { StationPopoverCard } from './StationPopoverCard.tsx';
 // OpenFreeMap's dark vector style — free, no API key (Carto's raster tiles now
 // require one). Tiles are cached by the service worker for offline use.
 const BASEMAP_STYLE = 'https://tiles.openfreemap.org/styles/dark';
+
+setWorkerUrl(maplibreWorkerUrl);
 
 function stationMarkerEl(line: LineId, isInterchange: boolean): HTMLDivElement {
   const el = document.createElement('div');
@@ -116,7 +122,6 @@ export function MapPage() {
   const labelsVisibleRef = useRef(false);
   const runsByKeyRef = useRef<Map<string, TrainRun>>(new Map());
   const selectedTrainRef = useRef<TrainRun | null>(null);
-  const [ready, setReady] = useState(false);
   const [selectedTrain, setSelectedTrain] = useState<TrainRun | null>(null);
   const [selectedStationId, setSelectedStationId] = useState<string | null>(null);
 
@@ -184,14 +189,25 @@ export function MapPage() {
       }
     };
 
+    // OpenFreeMap's dark style references a few sprite images it doesn't ship
+    // (e.g. "wood-pattern"); a transparent stand-in keeps the console clean.
+    map.setMissingStyleImageResolver(id => {
+      if (!map.hasImage(id)) map.addImage(id, { width: 1, height: 1, data: new Uint8Array(4) });
+    });
+
     map.on('move', scheduleSyncLineOverlay);
     map.on('resize', scheduleSyncLineOverlay);
     map.on('zoom', syncLabelVisibility);
     map.on('load', () => {
       syncLineOverlay();
       syncLabelVisibility();
-      setReady(true);
     });
+
+    // Lines, stations and trains are DOM/SVG positioned through the map's own
+    // projection, which is valid from construction — so they must not wait for
+    // the basemap. Offline (style or tiles unreachable) the network still runs.
+    syncLineOverlay();
+    syncLabelVisibility();
 
     return () => {
       map.remove();
@@ -200,7 +216,6 @@ export function MapPage() {
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
     let frame: number;
 
     const tick = () => {
@@ -289,7 +304,7 @@ export function MapPage() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [ready]);
+  }, []); // runs after the map effect above in the same commit, so mapRef is set
 
   const recenter = () => {
     const map = mapRef.current;

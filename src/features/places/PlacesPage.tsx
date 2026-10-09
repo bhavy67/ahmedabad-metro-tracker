@@ -40,6 +40,9 @@ const CATEGORY_ICON: Record<CuratedPlace['category'], React.ReactNode> = {
   attraction: <IconStars size={16} stroke={1.75} />,
 };
 
+/** Past this, suggesting a walk from the station stops being helpful. */
+const MAX_WALK_MINUTES = 25;
+
 const CATEGORY_TONE: Record<CuratedPlace['category'], string> = {
   transport: 'var(--line-violet)',
   mall: 'var(--line-yellow)',
@@ -77,7 +80,7 @@ export function PlacesPage() {
     clear();
   }
 
-  const showDropdown = query.trim().length > 0 && (status === 'loading' || nominatimResults.length > 0);
+  const showDropdown = query.trim().length > 0 && status !== 'idle';
 
   return (
     <div className="mx-auto grid w-full max-w-[1240px] gap-3.5 px-3.5 md:px-7 lg:grid-cols-12 lg:items-start">
@@ -138,7 +141,17 @@ export function PlacesPage() {
                 </button>
               ))}
               {status === 'done' && nominatimResults.length === 0 && (
-                <div className="px-4 py-3 text-[13px] text-muted-foreground">No results found</div>
+                <div className="px-4 py-3 text-[13px] text-muted-foreground">No places found — try a landmark or area name.</div>
+              )}
+              {status === 'offline' && (
+                <div className="px-4 py-3 text-[13px] text-muted-foreground">
+                  Search needs a connection. The popular places below still work offline.
+                </div>
+              )}
+              {status === 'error' && (
+                <div className="px-4 py-3 text-[13px] text-muted-foreground">
+                  Search isn't responding right now. Try again in a moment, or pick a popular place below.
+                </div>
               )}
             </div>
           )}
@@ -162,7 +175,10 @@ export function PlacesPage() {
               <div className="min-w-0 flex-1">
                 <p className="truncate font-display text-[19px] font-medium tracking-tight">{result.station.name}</p>
                 <p className="tnum mt-0.5 font-mono text-[12px] text-muted-foreground">
-                  {(result.distanceMeters / 1000).toFixed(1)} km · ~{walkingMinutes(result.distanceMeters)} min walk
+                  {(result.distanceMeters / 1000).toFixed(1)} km ·{' '}
+                  {walkingMinutes(result.distanceMeters) > MAX_WALK_MINUTES
+                    ? 'too far to walk — take an auto or cab'
+                    : `~${walkingMinutes(result.distanceMeters)} min walk`}
                 </p>
               </div>
             </div>
@@ -180,7 +196,7 @@ export function PlacesPage() {
                 rel="noopener noreferrer"
                 className="pill-btn ghost"
               >
-                Walk there
+                {walkingMinutes(result.distanceMeters) > MAX_WALK_MINUTES ? 'Directions' : 'Walk there'}
                 <span className="knob">
                   <IconRoute size={16} stroke={1.75} />
                 </span>

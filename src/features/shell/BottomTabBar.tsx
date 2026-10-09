@@ -35,7 +35,7 @@ export function BottomTabBar({ onOpenLines }: { onOpenLines: () => void }) {
             {inner}
           </NavLink>
         ) : (
-          <button key={item.label} type="button" onClick={onOpenLines} aria-label="Open line picker" className={cls}>
+          <button key={item.label} type="button" onClick={onOpenLines} aria-haspopup="dialog" className={cls}>
             {inner}
           </button>
         );

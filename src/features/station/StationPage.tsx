@@ -1,11 +1,12 @@
 import { useParams, Link, Navigate } from 'react-router';
 import {
-  IconStar, IconStarFilled, IconBuildingArch, IconArrowsExchange, IconArrowLeft, IconArrowUpRight,
+  IconStar, IconStarFilled, IconBuildingArch, IconArrowsExchange, IconArrowUpRight,
 } from '@tabler/icons-react';
 import { getStation, network } from '@/src/lib/metro/network.ts';
 import { useFavourites } from '@/src/hooks/useFavourites.ts';
 import { formatScheduleTime12 } from '@/src/lib/metro/clock.ts';
 import { Bezel } from '@/components/Bezel.tsx';
+import { BackButton } from '@/src/features/shell/BackButton.tsx';
 import { DepartureBoard } from './DepartureBoard.tsx';
 import { LastTrainStrip } from './LastTrainStrip.tsx';
 
@@ -30,18 +31,12 @@ export function StationPage() {
         />
 
         <div className="relative mb-6 flex items-center justify-between">
-          <Link
-            to="/"
-            aria-label="Back to home"
-            className="press surface surface-hover flex h-10 w-10 items-center justify-center rounded-full"
-          >
-            <IconArrowLeft size={18} stroke={1.75} />
-          </Link>
+          <BackButton />
           <button
             type="button"
             onClick={() => toggle(station.id)}
             aria-pressed={favourite}
-            aria-label={favourite ? 'Remove from favourites' : 'Add to favourites'}
+            aria-label={favourite ? 'Saved to favourites' : 'Save to favourites'}
             className="press surface surface-hover flex h-11 items-center gap-2 rounded-full px-4 text-[13px] font-bold"
           >
             {favourite ? (
