@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "in.bhavyladani.metro",
+      "sha256_cert_fingerprints": [
+        "17:B8:79:A5:D7:3E:8B:D1:5F:2C:F0:FE:F3:FF:FA:A9:78:14:A2:C9:62:D3:0C:BA:47:E4:95:78:8B:4D:DE:A7"
+      ]
+    }
+  }
+]
