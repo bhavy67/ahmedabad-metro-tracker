@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { IconTrash, IconLoader2, IconCircleCheck, IconCalendarEvent } from '@tabler/icons-react';
 import { hardReset } from '@/src/lib/pwa/cacheBust.ts';
 import { timetableInfo } from '@/src/lib/metro/network.ts';
@@ -37,6 +38,9 @@ export function AppFooter() {
           <span className="inline-flex items-center gap-1.5">
             <IconCalendarEvent size={13} stroke={1.75} /> Timetable from {timetableInfo.effective}
           </span>
+          <Link to="/privacy" className="underline-offset-4 hover:text-foreground hover:underline">
+            Privacy
+          </Link>
         </p>
       </div>
 
