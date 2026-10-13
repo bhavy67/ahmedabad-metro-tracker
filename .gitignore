@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Private Play Store launch kit (listing copy, store assets, release binaries)
+PLAY_STORE_LAUNCH.md
+play-store/
