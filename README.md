@@ -4,10 +4,10 @@
 
 # MetroNow
 
-### Every Ahmedabad Metro train, live — in your pocket.
+### Every Ahmedabad Metro train, live, right in your pocket.
 
-Know when your train leaves, where it is right now, and the fastest way to get anywhere on the network.<br/>
-No sign-up. No ads. Works even when your signal doesn't.
+Know when your train leaves, where it is right now, and the quickest way to reach any station.<br/>
+No sign up. No ads. It keeps working even when your signal does not.
 
 <br/>
 
@@ -19,7 +19,7 @@ No sign-up. No ads. Works even when your signal doesn't.
 
 <br/>
 
-<img src="docs/screenshots/desktop.webp" alt="MetroNow on desktop — live network map and commute countdown" width="100%" />
+<img src="docs/screenshots/desktop.webp" alt="MetroNow on a laptop, showing the live network and a commute countdown" width="100%" />
 
 </div>
 
@@ -27,19 +27,19 @@ No sign-up. No ads. Works even when your signal doesn't.
 
 ## Why MetroNow
 
-You're at the platform, or running for it, and you want one answer: **when's the next train?**
+Picture yourself on the platform, or rushing towards it. All you want to know is one thing: when is the next train?
 
-MetroNow gives you that in a glance — then everything else you'd want to know. Every train on the Blue, Red, Yellow and Violet lines moves on a live map. Every station has a departure board that counts down to the minute. And the journey planner finds the fastest route, the changes and the exact fare, before you've even reached the turnstile.
+MetroNow answers that the moment you open it, and then gives you everything else you might need. Every train on the Blue, Red, Yellow and Violet lines moves across a live map. Every station has its own departure board that counts down to the minute. The journey planner shows you the quickest route, where to change and exactly what the ticket costs, all before you reach the gate.
 
-It's built for real commutes: it opens instantly, keeps working underground, and remembers the trip you take every day.
+It was made for daily commutes. It opens instantly, keeps working underground, and remembers the trip you take every day.
 
 <div align="center">
 <table>
   <tr>
-    <td align="center"><img src="docs/screenshots/home.webp" width="190" alt="Home screen with live network and commute countdown" /><br/><sub><b>Your city, live</b></sub></td>
+    <td align="center"><img src="docs/screenshots/home.webp" width="190" alt="Home screen with the live network and a commute countdown" /><br/><sub><b>Your city, live</b></sub></td>
     <td align="center"><img src="docs/screenshots/map.webp" width="190" alt="Live map with every train moving" /><br/><sub><b>Every train on the map</b></sub></td>
-    <td align="center"><img src="docs/screenshots/station.webp" width="190" alt="Station departures with last-train warning" /><br/><sub><b>Departures, to the minute</b></sub></td>
-    <td align="center"><img src="docs/screenshots/plan.webp" width="190" alt="Journey planner with fare and changes" /><br/><sub><b>Plan any journey</b></sub></td>
+    <td align="center"><img src="docs/screenshots/station.webp" width="190" alt="Station departures with a last train warning" /><br/><sub><b>Departures, to the minute</b></sub></td>
+    <td align="center"><img src="docs/screenshots/plan.webp" width="190" alt="Journey planner showing the fare and changes" /><br/><sub><b>Plan any journey</b></sub></td>
   </tr>
 </table>
 </div>
@@ -49,89 +49,89 @@ It's built for real commutes: it opens instantly, keeps working underground, and
 ## What you can do
 
 **🚇 See the whole network, live**
-Watch every train glide along its line in real time, on a clean schematic or a full city map. Tap any train to see where it's heading and how many stops it has left.
+Watch every train glide along its line, either on a clean route diagram or on a full map of the city. Tap any train to see where it is heading and how many stops it has left.
 
-**⏱ Never guess a departure again**
-Every station shows its next trains with live countdowns — and warns you when the **last train of the night** is about to leave.
+**⏱ Stop guessing departure times**
+Every station lists its next trains with live countdowns, and gives you a heads up when the last train of the night is about to leave.
 
-**🧭 Get anywhere, the fastest way**
-Pick two stations and get the quickest route, every change, the waiting time at each interchange and the exact fare. Need to be somewhere by a certain time? Switch to **Arrive by**.
+**🧭 Reach any station the quickest way**
+Pick two stations and you get the fastest route, every change, how long you will wait at each interchange and the exact fare. Need to be somewhere by a certain time? Switch to **Arrive by** and MetroNow works backwards for you.
 
 **🏠 Your commute, one tap away**
-Save home and work once. MetroNow shows a countdown ring to your next train and flips direction for the ride back.
+Save your home and work stations once. From then on, MetroNow shows a countdown to your next train and flips around for the ride back.
 
-**📍 Find the nearest station — to you, or anywhere**
-Use your location, or search any place in Ahmedabad: malls, hospitals, colleges, the railway station, Kankaria Lake. MetroNow tells you the closest station and whether it's a short walk or an auto ride.
+**📍 Find the nearest station, wherever you are**
+Use your location, or search for any place in Ahmedabad: a mall, a hospital, a college, the railway station or Kankaria Lake. MetroNow tells you the closest station and whether it is a short walk or a better idea to take an auto.
 
 **⭐ Favourites on your home screen**
-Star the stations you use and see their departures the moment you open the app.
+Star the stations you use most and see their departures the moment you open the app.
 
 **🔗 Share a trip**
-Send a journey to a friend as a link — it opens with the route already planned.
+Send a journey to a friend as a link. It opens with the route already planned for them.
 
 **🗣 Speaks your language**
-Search stations in English, ગુજરાતી or हिन्दी.
+Search for stations in English, ગુજરાતી or हिन्दी.
 
 ---
 
-## Built for the real world
+## Built for everyday life
 
 | | |
 |---|---|
-| **Works offline** | The full timetable lives on your phone. Underground, in airplane mode, on a bad network — it still works. |
-| **Instant** | Opens in a blink and stays smooth on everyday phones. |
-| **Private by design** | No account, no tracking, no ads. Your location is used on your phone and never sent anywhere. [Read the privacy policy →](https://metro.bhavyladani.in/privacy) |
-| **Easy on the eyes** | A calm dark design where the four line colours glow — readable at a glance, comfortable at night. |
-| **Everywhere** | Phone, tablet or laptop — the same app, designed for each screen. |
+| **Works offline** | The full timetable lives on your phone. Underground, in airplane mode or on a weak network, it still works. |
+| **Fast** | It opens in a blink and stays smooth on everyday phones. |
+| **Private** | No account, no tracking and no ads. Your location is used only on your phone and is never sent anywhere. [Read the privacy policy](https://metro.bhavyladani.in/privacy) |
+| **Easy on the eyes** | A calm dark design where the four line colours glow, so you can read it at a glance and comfortably at night. |
+| **On every screen** | Phone, tablet or laptop, it is the same app, shaped for each one. |
 
 ---
 
 ## Get MetroNow
 
 **🤖 Android**
-- **Google Play** — coming soon.
-- **Right now:** [download the APK](https://github.com/bhavy67/ahmedabad-metro-tracker/releases/latest/download/MetroNow.apk), open it, and allow installing from that source when your phone asks.
-- Or open [metro.bhavyladani.in](https://metro.bhavyladani.in) in Chrome and tap the **install** icon in the top bar.
+* **Google Play:** coming soon.
+* **Right now:** [download the APK](https://github.com/bhavy67/ahmedabad-metro-tracker/releases/latest/download/MetroNow.apk), open it, and allow installing from that source when your phone asks.
+* You can also open [metro.bhavyladani.in](https://metro.bhavyladani.in) in Chrome and tap the install icon in the top bar.
 
-**🍎 iPhone & iPad**
-Open [metro.bhavyladani.in](https://metro.bhavyladani.in) in **Safari** → tap **Share** → **Add to Home Screen**. It runs full-screen, just like an app.
+**🍎 iPhone and iPad**
+Open [metro.bhavyladani.in](https://metro.bhavyladani.in) in **Safari**, tap **Share**, then choose **Add to Home Screen**. It opens full screen, just like any other app.
 
 **💻 Desktop**
-Just visit [metro.bhavyladani.in](https://metro.bhavyladani.in) — or click the install icon in Chrome or Edge to keep it in your dock.
+Simply visit [metro.bhavyladani.in](https://metro.bhavyladani.in), or click the install icon in Chrome or Edge to keep it handy.
 
-> When MetroNow arrives on Google Play, uninstall the APK version first, then install from Play to get automatic updates.
+> Once MetroNow arrives on Google Play, please remove the APK version first and then install it from Play, so you get updates automatically.
 
 ---
 
 ## Questions
 
 **Is this the official Ahmedabad Metro app?**
-No. MetroNow is an independent, unofficial app made by a rider, for riders. It isn't affiliated with or endorsed by Gujarat Metro Rail Corporation (GMRC).
+No. MetroNow is an independent, unofficial app, made by a rider for fellow riders. It is not affiliated with or endorsed by Gujarat Metro Rail Corporation (GMRC).
 
 **Is it really live?**
-Ahmedabad Metro doesn't publish a real-time train feed, so MetroNow calculates where every train *should* be, second by second, from the published GMRC timetable. That's accurate when trains run to schedule — but it can't see delays or disruptions.
+Ahmedabad Metro does not publish a real time train feed, so MetroNow works out where every train should be, second by second, from the published GMRC timetable. That is accurate whenever trains run on schedule, but it cannot see delays or disruptions.
 
-**How current is the timetable?**
-The date the timetable took effect is shown inside the app (tap **Live** in the top bar). If timings change, MetroNow is updated — and every installed copy picks up the new timetable automatically.
+**How up to date is the timetable?**
+You can see the date the current timetable took effect inside the app by tapping **Live** in the top bar. Whenever timings change, MetroNow gets updated, and every installed copy picks up the new timetable on its own.
 
 **Does it cost anything?**
-No. Free, with no ads and no in-app purchases.
+Not a rupee. It is free, with no ads and nothing to buy inside the app.
 
-**I found a wrong timing or a bug.**
-Please [open an issue](https://github.com/bhavy67/ahmedabad-metro-tracker/issues) — it genuinely helps.
+**I spotted a wrong timing or a bug.**
+Please [let us know here](https://github.com/bhavy67/ahmedabad-metro-tracker/issues). Every report makes MetroNow better for everyone.
 
 ---
 
 ## For developers
 
-MetroNow is open source. Setup, architecture, releases, caching and the Android build are documented in **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**.
+MetroNow is open source. Setup, architecture, releases, caching and the Android build are all covered in **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)**.
 
 ---
 
 <div align="center">
 
-Made in Ahmedabad by **[Bhavy Ladani](https://bhavyladani.in)**<br/>
-<sub>Originally started by Darshan Patel · Timetable from GMRC · Maps © OpenStreetMap contributors, OpenFreeMap · Place search by Nominatim</sub>
+Made with care in Ahmedabad by **[Bhavy Ladani](https://bhavyladani.in)**<br/>
+<sub>Originally started by Darshan Patel · Timetable from GMRC · Maps © OpenStreetMap contributors and OpenFreeMap · Place search by Nominatim</sub>
 
 <sub>MetroNow is not affiliated with Gujarat Metro Rail Corporation (GMRC).</sub>
 
