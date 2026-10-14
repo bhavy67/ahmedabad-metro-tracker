@@ -62,7 +62,7 @@
 |---|---|---|
 | Build | **Vite** | Fast, first-class PWA plugin. |
 | UI | **React + TypeScript (strict)** | React Compiler on if available. |
-| Styling | **Tailwind v4** + CSS custom properties for tokens | Tokens on `:root`; utilities for layout. |
+| Styling | **Tailwind v4** + CSS custom properties for tokens | Tokens on `:p`; utilities for layout. |
 | Components | **shadcn/ui on Base UI or Radix** | Copy-in components you own; restyle the primitives once. |
 | Routing | **React Router** | URL is state (see §5). |
 | Icons | **Tabler / Phosphor** (tree-shaken) | One family, one stroke weight. |
@@ -354,6 +354,7 @@ m.appVersionName = '1.0.0'; m.appVersionCode = 1;
 m.enableNotifications = false;                       // true only if you send web push
 m.features = { locationDelegation: { enabled: true } }; // if you use geolocation
 m.orientation = 'default';
+m.minSdkVersion = 24;                                 // Play automatic protection requires ≥ 24
 for (const k of ['themeColorDark','navigationColor','navigationColorDark','navigationDividerColor','navigationDividerColorDark']) m[k] = m.themeColor; // defaults are #000000
 m.signingKey = { path: './android.keystore', alias: 'appname' };
 await new TwaGenerator().createTwaProject('android', m, new ConsoleLog('gen'));
@@ -362,6 +363,7 @@ await m.saveToFile('android/twa-manifest.json');
 ```
 - **MUST:** `android/.gitignore` → `*.keystore`, `*.jks`, `keystore.properties`, `.gradle/`, `build/`, `local.properties`, `*.apk`, `*.aab`, `*.idsig`.
 - **MUST:** `targetSdkVersion` = current Play requirement (check yearly).
+- **MUST:** `minSdkVersion` ≥ **24** (Android 7.0). **[lesson]** Bubblewrap defaults to 21, and Play rejects the upload: "Play automatic protection requires a minimum SDK version of 24". Set `m.minSdkVersion = 24` when generating, or edit `twa-manifest.json` + `app/build.gradle` and recompute `manifest-checksum.txt`.
 
 ### Toolchain (no admin rights needed)
 - Install into `~/.bubblewrap/`: **JDK 17**, **Android cmdline-tools** (`android_sdk/cmdline-tools/latest`), `platforms;android-<target>`, `build-tools;<version Bubblewrap expects>`, `platform-tools` (adb).
