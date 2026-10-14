@@ -89,6 +89,8 @@ export default defineConfig({
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json}'],
                 navigateFallback: '/index.html',
+                // Real files the SPA must never shadow: Android's ownership proof and robots.txt.
+                navigateFallbackDenylist: [/^\/\.well-known\//, /^\/robots\.txt$/],
                 // Every Workbox cache is namespaced by the epoch, so a bust
                 // orphans the old ones wholesale instead of trying to
                 // invalidate them entry by entry.
