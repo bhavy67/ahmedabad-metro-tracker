@@ -5,7 +5,10 @@
       "namespace": "android_app",
       "package_name": "in.bhavyladani.metro",
       "sha256_cert_fingerprints": [
-        "17:B8:79:A5:D7:3E:8B:D1:5F:2C:F0:FE:F3:FF:FA:A9:78:14:A2:C9:62:D3:0C:BA:47:E4:95:78:8B:4D:DE:A7"
+        "17:B8:79:A5:D7:3E:8B:D1:5F:2C:F0:FE:F3:FF:FA:A9:78:14:A2:C9:62:D3:0C:BA:47:E4:95:78:8B:4D:DE:A7",
+        "78:97:0A:6F:11:6F:8A:C0:F5:91:28:8F:BD:1C:EF:A5:E4:97:F7:55:8F:1B:08:48:17:29:CD:3A:5F:6C:74:2B",
+        "E7:16:E7:AE:85:98:D3:21:00:45:34:DE:90:82:15:14:25:49:12:55:87:48:A3:1F:84:43:AC:98:3F:10:37:AC",
+        "1A:40:84:34:D3:EA:4E:37:4C:91:E0:95:FF:48:DD:5F:AA:E0:B1:E0:30:BA:72:04:C7:31:D6:E0:FD:60:74:FD"
       ]
     }
   }
