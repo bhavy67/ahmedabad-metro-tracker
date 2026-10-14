@@ -1,7 +1,8 @@
 import { Bezel } from '@/components/Bezel.tsx';
 import { BackButton } from '@/src/features/shell/BackButton.tsx';
 
-const UPDATED = '9 October 2026';
+const UPDATED = '14 October 2026';
+const DEVELOPER = 'Bhavy Ladani';
 const ISSUES_URL = 'https://github.com/bhavy67/ahmedabad-metro-tracker/issues';
 
 /**
@@ -78,8 +79,14 @@ export function PrivacyPage() {
           MetroNow doesn't collect personal information from anyone, including children.
         </Section>
 
+        <Section title="Who we are">
+          MetroNow is developed and published by {DEVELOPER}, an independent developer based in Ahmedabad, India. This
+          policy covers the MetroNow website (metro.bhavyladani.in) and the MetroNow app for Android.
+        </Section>
+
         <Section title="Changes and contact">
-          If this policy changes, the date at the top will change with it. Questions or concerns? Open an issue on{' '}
+          If this policy changes, the date at the top will change with it. Questions, concerns or requests about your
+          privacy? Open an issue on{' '}
           <a className="text-foreground underline" href={ISSUES_URL} target="_blank" rel="noopener noreferrer">
             GitHub
           </a>
