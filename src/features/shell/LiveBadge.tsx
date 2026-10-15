@@ -1,5 +1,6 @@
 import { IconBroadcast, IconClockHour4, IconAlertTriangle, IconCalendarEvent, type Icon as TablerIcon } from '@tabler/icons-react';
 import { timetableInfo } from '@/src/lib/metro/network.ts';
+import { OFFICIAL_SOURCE } from '@/src/lib/metro/sources.ts';
 import { APP_VERSION, BUILD_ID, CACHE_EPOCH } from '@/src/lib/pwa/cacheBust.ts';
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose } from '@/components/ui/drawer';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
@@ -60,6 +61,23 @@ export function LiveBadge() {
                 : "Not yet checked against GMRC's official timetable, so some timings may differ slightly."
             }
           />
+        </div>
+
+        <div className="surface mx-4 mt-2 rounded-[20px] px-4 py-3 text-[13px] leading-relaxed text-muted-foreground">
+          <p className="mb-1 text-[14px] font-bold text-foreground">Official source</p>
+          Timetable, routes and fares are published by {OFFICIAL_SOURCE.publisher}. MetroNow does not represent any
+          government entity and is not affiliated with GMRC.
+          <span className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+            <a href={OFFICIAL_SOURCE.timetable} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+              GMRC timetable
+            </a>
+            <a href={OFFICIAL_SOURCE.routesAndFares} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+              Routes and fares
+            </a>
+            <a href={OFFICIAL_SOURCE.home} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+              gujaratmetrorail.com
+            </a>
+          </span>
         </div>
 
         <DrawerFooter className="pt-5">

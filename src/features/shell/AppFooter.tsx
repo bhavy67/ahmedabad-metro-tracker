@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { IconTrash, IconLoader2, IconCircleCheck, IconCalendarEvent } from '@tabler/icons-react';
 import { hardReset } from '@/src/lib/pwa/cacheBust.ts';
 import { timetableInfo } from '@/src/lib/metro/network.ts';
+import { OFFICIAL_SOURCE } from '@/src/lib/metro/sources.ts';
 import { PulseLogo } from './PulseLogo.tsx';
 
 /**
@@ -29,7 +30,22 @@ export function AppFooter() {
           </span>
         </div>
         <p className="mt-2 max-w-[42ch] text-[13px] text-muted-foreground">
-          Live Ahmedabad Metro, computed from the official GMRC timetable. An unofficial companion app.
+          Ahmedabad Metro train times, computed from the official GMRC timetable. An independent app that does not
+          represent any government entity and is not affiliated with GMRC.
+        </p>
+        <p className="mt-2 text-[12px] text-muted-foreground">
+          Official source:{' '}
+          <a href={OFFICIAL_SOURCE.timetable} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+            GMRC timetable
+          </a>
+          {' · '}
+          <a href={OFFICIAL_SOURCE.routesAndFares} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+            Routes and fares
+          </a>
+          {' · '}
+          <a href={OFFICIAL_SOURCE.home} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+            gujaratmetrorail.com
+          </a>
         </p>
         <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">

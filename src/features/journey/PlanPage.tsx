@@ -14,6 +14,7 @@ import { Bezel } from '@/components/Bezel.tsx';
 import CountUp from '@/components/CountUp.tsx';
 import { cn } from '@/lib/utils';
 import { useRecentJourneys } from '@/src/hooks/useRecentJourneys.ts';
+import { OFFICIAL_SOURCE } from '@/src/lib/metro/sources.ts';
 
 type PlanMode = 'depart' | 'arrive';
 
@@ -289,6 +290,13 @@ function JourneyResult({
         <StatCard icon={IconArrowsExchange} label="Changes" value={plan.transferCount} />
         <StatCard icon={IconTicket} label="Fare" value={plan.fare} prefix="₹" />
       </div>
+      <p className="-mt-1.5 px-1 text-[12px] text-muted-foreground">
+        Fare and timings per the official{' '}
+        <a href={OFFICIAL_SOURCE.routesAndFares} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+          GMRC routes and fares
+        </a>
+        .
+      </p>
 
       {plan.isTomorrow && (
         <p className="rounded-[20px] border border-line-yellow/30 bg-line-yellow/8 px-4 py-3 text-[13px] font-semibold">

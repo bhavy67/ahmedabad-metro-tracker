@@ -1,7 +1,8 @@
 import { Bezel } from '@/components/Bezel.tsx';
 import { BackButton } from '@/src/features/shell/BackButton.tsx';
+import { OFFICIAL_SOURCE } from '@/src/lib/metro/sources.ts';
 
-const UPDATED = '14 October 2026';
+const UPDATED = '15 October 2026';
 const DEVELOPER = 'Bhavy Ladani';
 const ISSUES_URL = 'https://github.com/bhavy67/ahmedabad-metro-tracker/issues';
 
@@ -71,8 +72,21 @@ export function PrivacyPage() {
         </Section>
 
         <Section title="Timetable and accuracy">
-          Train positions and times are computed from the published GMRC timetable on your device. They show where trains
-          are scheduled to be, not live tracking, and can't reflect delays or disruptions.
+          Train positions and times are computed on your device from the timetable published by{' '}
+          {OFFICIAL_SOURCE.publisher}. They show where trains are scheduled to be, not live tracking, and can't reflect
+          delays or disruptions. Official sources:{' '}
+          <a href={OFFICIAL_SOURCE.timetable} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+            GMRC timetable
+          </a>
+          ,{' '}
+          <a href={OFFICIAL_SOURCE.routesAndFares} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+            routes and fares
+          </a>{' '}
+          and{' '}
+          <a href={OFFICIAL_SOURCE.home} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">
+            gujaratmetrorail.com
+          </a>
+          .
         </Section>
 
         <Section title="Children">
