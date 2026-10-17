@@ -54,7 +54,7 @@ export function PrivacyPage() {
               service to look it up. Your location is not included.
             </li>
             <li>
-              <b className="text-foreground">Map</b> — the live map loads map tiles from{' '}
+              <b className="text-foreground">Map</b> — the map loads map tiles from{' '}
               <a className="text-foreground underline" href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">
                 OpenFreeMap
               </a>

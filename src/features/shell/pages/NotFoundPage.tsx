@@ -21,7 +21,7 @@ export function NotFoundPage() {
             </span>
           </Link>
           <Link to="/map" className="pill-btn ghost">
-            Live map
+            Map
             <span className="knob">
               <IconMap2 size={16} stroke={1.75} />
             </span>

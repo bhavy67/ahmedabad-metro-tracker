@@ -65,9 +65,9 @@ export default defineConfig({
             includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
             manifest: {
                 id: '/',
-                name: 'MetroNow — Ahmedabad Metro',
+                name: 'MetroNow: Ahmedabad Trains',
                 short_name: 'MetroNow',
-                description: 'Live train positions, timings and journey planning for the Ahmedabad Metro, computed from the official GMRC timetable.',
+                description: 'Train times, departures and journey planning for the metro in Ahmedabad, computed from the official GMRC timetable. Independent app, not affiliated with GMRC.',
                 theme_color: '#050507',
                 background_color: '#050507',
                 display: 'standalone',
@@ -83,7 +83,7 @@ export default defineConfig({
                 ],
                 shortcuts: [
                     {name: 'Plan a journey', short_name: 'Plan', url: '/plan', icons: [{src: '/pwa-192x192.png', sizes: '192x192'}]},
-                    {name: 'Live map', short_name: 'Live Map', url: '/map', icons: [{src: '/pwa-192x192.png', sizes: '192x192'}]},
+                    {name: 'Map', short_name: 'Map', url: '/map', icons: [{src: '/pwa-192x192.png', sizes: '192x192'}]},
                 ],
             },
             workbox: {

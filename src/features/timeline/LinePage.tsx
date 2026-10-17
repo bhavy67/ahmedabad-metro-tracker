@@ -59,7 +59,7 @@ export function LinePage() {
           </span>
           <span className="surface tnum inline-flex items-center rounded-full px-3 py-1.5 font-mono">{stationOrder.length} stations</span>
           <span className="surface inline-flex items-center gap-1.5 rounded-full px-3 py-1.5">
-            <span className="live-dot" /> {runsOnLine.length} trains live
+            <span className="live-dot" /> {runsOnLine.length} trains running
           </span>
         </div>
       </header>

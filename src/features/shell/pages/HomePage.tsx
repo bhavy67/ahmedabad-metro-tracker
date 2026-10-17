@@ -36,7 +36,7 @@ export function HomePage() {
         <div className="rise flex flex-col justify-center px-1.5 pt-2 pb-4 lg:col-span-5 lg:pr-6">
           <span className="eyebrow self-start">
             <span className="live-dot" />
-            {total > 0 ? `Live · ${total} train${total === 1 ? '' : 's'}` : 'No service right now'}
+            {total > 0 ? `${total} train${total === 1 ? '' : 's'} running` : 'No service right now'}
           </span>
           <h1 className="mt-4 font-display text-[clamp(2rem,7.6vw,3.6rem)] leading-[1.02] font-medium tracking-[-0.045em]">
             {greeting(clock.secondsOfDay)},
@@ -44,7 +44,7 @@ export function HomePage() {
             <span className="glow-text">{total > 0 ? 'the city is moving.' : 'the metro is resting.'}</span>
           </h1>
           <p className="mt-4 max-w-[40ch] text-[15px] text-muted-foreground md:text-[16px]">
-            Every train on Ahmedabad Metro, in real time, computed from the official GMRC timetable. Works without
+            Every metro train in Ahmedabad, worked out second by second from the official GMRC timetable. Works without
             signal underground.
           </p>
         </div>
@@ -70,7 +70,7 @@ export function HomePage() {
               to="/map"
               className="press ml-auto inline-flex items-center gap-1.5 rounded-full bg-white/8 px-3 py-1 text-[12px] font-bold hover:bg-white/12"
             >
-              <IconMap2 size={14} stroke={1.75} /> Live map
+              <IconMap2 size={14} stroke={1.75} /> Open map
             </Link>
           </div>
         </Bezel>
@@ -131,7 +131,7 @@ export function HomePage() {
                     />
                     {l.name}
                   </span>
-                  <span className="tnum font-mono text-[12px] text-muted-foreground">{counts[line]} live</span>
+                  <span className="tnum font-mono text-[12px] text-muted-foreground">{counts[line]} running</span>
                 </span>
                 <span className="relative mt-4 font-display text-[19px] leading-tight font-medium tracking-[-0.03em]">
                   {l.from}
@@ -193,7 +193,7 @@ function NearestCard({ nearest }: { nearest: ReturnType<typeof useNearestStation
           </span>
           <p className="font-display text-[18px] font-medium tracking-tight">Find the nearest station</p>
           <p className="mx-auto mt-1.5 mb-5 max-w-[28ch] text-[13px] text-muted-foreground">
-            See live departures from wherever you are right now.
+            See the next departures from wherever you are right now.
           </p>
           <button type="button" onClick={nearest.locate} className="pill-btn">
             Use my location

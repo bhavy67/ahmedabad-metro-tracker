@@ -11,7 +11,7 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Now', short: 'Now', icon: IconCircleDot, match: p => p === '/' },
-  { to: '/map', label: 'Live map', short: 'Map', icon: IconMap2, match: p => p.startsWith('/map') },
+  { to: '/map', label: 'Map', short: 'Map', icon: IconMap2, match: p => p.startsWith('/map') },
   { label: 'Lines', short: 'Lines', icon: IconRoute, match: p => p.startsWith('/line') },
   { to: '/plan', label: 'Plan', short: 'Plan', icon: IconMapPin, match: p => p.startsWith('/plan') || p.startsWith('/station') },
   { to: '/places', label: 'Places', short: 'Places', icon: IconBuildingStore, match: p => p.startsWith('/places') },

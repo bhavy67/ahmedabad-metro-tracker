@@ -113,7 +113,7 @@ export function NetworkPulse() {
   }, []);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Live schematic of the Ahmedabad Metro network" className="block h-auto w-full">
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Schematic of the metro network in Ahmedabad with scheduled train positions" className="block h-auto w-full">
       <defs>
         <filter id="np-line-glow" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="3.2" result="b" />

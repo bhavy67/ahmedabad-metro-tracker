@@ -60,7 +60,7 @@ export function MenuOverlay({ open, onClose, onOpenLines }: { open: boolean; onC
 
       <div className="mt-10 overflow-hidden">
         <div {...reveal(NAV_ITEMS.length)}>
-          <p className="mb-3 text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Lines · live now</p>
+          <p className="mb-3 text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase">Lines · trains running</p>
           <div className="grid grid-cols-2 gap-2">
             {LINE_IDS.map(line => (
               <Link

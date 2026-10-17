@@ -16,9 +16,9 @@ export function LiveBadge() {
           }
         >
           <span className="live-dot" />
-          <span>Live</span>
+          <span>Schedule</span>
         </TooltipTrigger>
-        <TooltipContent side="bottom">About live data</TooltipContent>
+        <TooltipContent side="bottom">How MetroNow works</TooltipContent>
       </Tooltip>
 
       <DrawerContent>
@@ -30,9 +30,9 @@ export function LiveBadge() {
             <IconBroadcast size={26} stroke={1.5} />
           </div>
           <DrawerHeader className="items-center px-0 text-center md:text-center">
-            <DrawerTitle className="text-[20px]">About live data</DrawerTitle>
+            <DrawerTitle className="text-[20px]">How MetroNow works</DrawerTitle>
             <DrawerDescription className="text-[14px] leading-relaxed">
-              Ahmedabad Metro doesn't publish a real-time train feed. Positions and countdowns
+              GMRC does not publish a real time train feed for its Ahmedabad network. Positions and countdowns
               are computed from the official GMRC timetable against the current time.
             </DrawerDescription>
           </DrawerHeader>

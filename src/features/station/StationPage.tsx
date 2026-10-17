@@ -88,7 +88,7 @@ export function StationPage() {
           <div className="flex items-center justify-between px-3 pt-3 pb-2">
             <h2 className="font-display text-[19px] font-medium tracking-tight">Next departures</h2>
             <span className="eyebrow">
-              <span className="live-dot" /> Live
+              <span className="live-dot" /> Scheduled
             </span>
           </div>
           <LastTrainStrip stationId={station.id} />

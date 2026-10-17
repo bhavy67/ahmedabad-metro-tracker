@@ -30,7 +30,7 @@ export function AppFooter() {
           </span>
         </div>
         <p className="mt-2 max-w-[42ch] text-[13px] text-muted-foreground">
-          Ahmedabad Metro train times, computed from the official GMRC timetable. An independent app that does not
+          Train times for the metro in Ahmedabad, computed from the official GMRC timetable. An independent app that does not
           represent any government entity and is not affiliated with GMRC.
         </p>
         <p className="mt-2 text-[12px] text-muted-foreground">

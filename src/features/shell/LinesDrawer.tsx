@@ -43,7 +43,7 @@ export function LinesDrawer({ open, onOpenChange }: { open: boolean; onOpenChang
                     {meta.from} → {meta.to}
                   </span>
                   <span className="tnum mt-0.5 block font-mono text-[11px] text-muted-foreground">
-                    {formatScheduleTime12(meta.firstDeparture)} – {formatScheduleTime12(meta.lastArrival)} · {counts[line]} live
+                    {formatScheduleTime12(meta.firstDeparture)} – {formatScheduleTime12(meta.lastArrival)} · {counts[line]} running
                   </span>
                 </span>
                 <IconArrowUpRight size={18} stroke={1.5} className="relative shrink-0 text-muted-foreground" />

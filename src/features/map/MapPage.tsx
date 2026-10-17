@@ -343,7 +343,7 @@ function MapLegend() {
   return (
     <div className="glass absolute bottom-[calc(env(safe-area-inset-bottom)+96px)] left-3 z-10 flex max-w-[calc(100%-96px)] flex-wrap items-center gap-x-3 gap-y-1 rounded-[20px] px-3.5 py-2.5 text-[12px] font-bold shadow-lg md:bottom-6 md:left-6">
       <span className="flex items-center gap-1.5 text-muted-foreground">
-        <span className="live-dot" /> Live
+        <span className="live-dot" /> Running
       </span>
       {LINE_IDS.map(line => (
         <span key={line} className="flex items-center gap-1.5">
