@@ -2,8 +2,10 @@ import { Bezel } from '@/components/Bezel.tsx';
 import { BackButton } from '@/src/features/shell/BackButton.tsx';
 import { OFFICIAL_SOURCE } from '@/src/lib/metro/sources.ts';
 
-const UPDATED = '15 October 2026';
+const UPDATED = '19 October 2026';
 const DEVELOPER = 'Bhavy Ladani';
+/** Developer name of the Google Play account the Android app is published under. Must match the Play listing. */
+const PLAY_PUBLISHER = 'AvAdH';
 const ISSUES_URL = 'https://github.com/bhavy67/ahmedabad-metro-tracker/issues';
 
 /**
@@ -94,8 +96,9 @@ export function PrivacyPage() {
         </Section>
 
         <Section title="Who we are">
-          MetroNow is developed and published by {DEVELOPER}, an independent developer based in Ahmedabad, India. This
-          policy covers the MetroNow website (metro.bhavyladani.in) and the MetroNow app for Android.
+          MetroNow is developed by {DEVELOPER}, an independent developer based in Ahmedabad, India. The Android app is
+          published on Google Play under the developer name {PLAY_PUBLISHER}. This policy covers the MetroNow website
+          (metro.bhavyladani.in) and the MetroNow app for Android, and applies to both in the same way.
         </Section>
 
         <Section title="Changes and contact">
