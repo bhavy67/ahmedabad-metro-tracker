@@ -27,8 +27,8 @@ export function PrivacyPage() {
 
       <Bezel className="rise" style={{ '--i': 1 } as React.CSSProperties} coreClassName="space-y-7 text-[15px] leading-relaxed text-muted-foreground">
         <Section title="The short version">
-          MetroNow has no accounts, no ads, no analytics and no tracking. Nothing you do in the app is sent to us, because
-          we don't run a server that collects anything. MetroNow is an unofficial app and is not affiliated with Gujarat
+          NextStop has no accounts, no ads, no analytics and no tracking. Nothing you do in the app is sent to us, because
+          we don't run a server that collects anything. NextStop is an unofficial app and is not affiliated with Gujarat
           Metro Rail Corporation (GMRC).
         </Section>
 
@@ -92,13 +92,13 @@ export function PrivacyPage() {
         </Section>
 
         <Section title="Children">
-          MetroNow doesn't collect personal information from anyone, including children.
+          NextStop doesn't collect personal information from anyone, including children.
         </Section>
 
         <Section title="Who we are">
-          MetroNow is developed by {DEVELOPER}, an independent developer based in Ahmedabad, India. The Android app is
-          published on Google Play under the developer name {PLAY_PUBLISHER}. This policy covers the MetroNow website
-          (metro.bhavyladani.in) and the MetroNow app for Android, and applies to both in the same way.
+          NextStop is developed by {DEVELOPER}, an independent developer based in Ahmedabad, India. The Android app is
+          published on Google Play under the developer name {PLAY_PUBLISHER}. This policy covers the NextStop website
+          (metro.bhavyladani.in) and the NextStop app for Android, and applies to both in the same way.
         </Section>
 
         <Section title="Changes and contact">

@@ -275,7 +275,7 @@ function JourneyResult({
     if (mode === 'arrive') params.set('by', secondsToHHMM(plan.arriveSeconds));
     const url = `${window.location.origin}/plan?${params}`;
     if (navigator.share) {
-      try { await navigator.share({ title: 'MetroNow journey', url }); } catch { /* cancelled */ }
+      try { await navigator.share({ title: 'NextStop journey', url }); } catch { /* cancelled */ }
     } else {
       await navigator.clipboard.writeText(url);
       setCopied(true);

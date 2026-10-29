@@ -26,7 +26,7 @@ export function AppFooter() {
         <div className="flex items-center gap-2.5">
           <PulseLogo size={24} />
           <span className="font-display text-[16px] font-semibold tracking-tight">
-            Metro<span className="glow-text">Now</span>
+            Next<span className="glow-text">Stop</span>
           </span>
         </div>
         <p className="mt-2 max-w-[42ch] text-[13px] text-muted-foreground">

@@ -41,7 +41,7 @@ export function InstallButton({ className }: { className?: string }) {
         <Drawer open={iosHelpOpen} onOpenChange={setIosHelpOpen} showSwipeHandle>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>Install MetroNow</DrawerTitle>
+              <DrawerTitle>Install NextStop</DrawerTitle>
               <DrawerDescription className="text-[14px]">
                 Add it to your Home Screen for one-tap access and offline timetables.
               </DrawerDescription>

@@ -18,7 +18,7 @@ export function LiveBadge() {
           <span className="live-dot" />
           <span>Schedule</span>
         </TooltipTrigger>
-        <TooltipContent side="bottom">How MetroNow works</TooltipContent>
+        <TooltipContent side="bottom">How NextStop works</TooltipContent>
       </Tooltip>
 
       <DrawerContent>
@@ -30,7 +30,7 @@ export function LiveBadge() {
             <IconBroadcast size={26} stroke={1.5} />
           </div>
           <DrawerHeader className="items-center px-0 text-center md:text-center">
-            <DrawerTitle className="text-[20px]">How MetroNow works</DrawerTitle>
+            <DrawerTitle className="text-[20px]">How NextStop works</DrawerTitle>
             <DrawerDescription className="text-[14px] leading-relaxed">
               GMRC does not publish a real time train feed for its Ahmedabad network. Positions and countdowns
               are computed from the official GMRC timetable against the current time.
@@ -65,7 +65,7 @@ export function LiveBadge() {
 
         <div className="surface mx-4 mt-2 rounded-[20px] px-4 py-3 text-[13px] leading-relaxed text-muted-foreground">
           <p className="mb-1 text-[14px] font-bold text-foreground">Official source</p>
-          Timetable, routes and fares are published by {OFFICIAL_SOURCE.publisher}. MetroNow does not represent any
+          Timetable, routes and fares are published by {OFFICIAL_SOURCE.publisher}. NextStop does not represent any
           government entity and is not affiliated with GMRC.
           <span className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
             <a href={OFFICIAL_SOURCE.timetable} className="text-foreground underline underline-offset-4 hover:text-primary" target="_blank" rel="noopener noreferrer">

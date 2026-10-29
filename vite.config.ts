@@ -65,8 +65,8 @@ export default defineConfig({
             includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
             manifest: {
                 id: '/',
-                name: 'MetroNow: Ahmedabad Trains',
-                short_name: 'MetroNow',
+                name: 'NextStop: Ahmedabad Trains',
+                short_name: 'NextStop',
                 description: 'Train times, departures and journey planning for the metro in Ahmedabad, computed from the official GMRC timetable. Independent app, not affiliated with GMRC.',
                 theme_color: '#050507',
                 background_color: '#050507',

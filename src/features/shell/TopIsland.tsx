@@ -48,10 +48,10 @@ export function TopIsland({
 
   return (
     <header className="glass fixed top-[max(14px,env(safe-area-inset-top))] left-1/2 z-40 flex w-max max-w-[calc(100%-28px)] -translate-x-1/2 items-center gap-1 rounded-full p-1.5 shadow-lg">
-      <Link to="/" className="flex shrink-0 items-center gap-2 py-0.5 pr-3 pl-1.5" aria-label="MetroNow home">
+      <Link to="/" className="flex shrink-0 items-center gap-2 py-0.5 pr-3 pl-1.5" aria-label="NextStop home">
         <PulseLogo size={28} />
         <span className="font-display text-[15px] font-semibold tracking-tight max-[359px]:hidden">
-          Metro<span className="glow-text">Now</span>
+          Next<span className="glow-text">Stop</span>
         </span>
       </Link>
 
